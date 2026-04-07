@@ -12,6 +12,8 @@
             <p class="text-zinc-400 text-sm">Log in to continue saving smarter</p>
         </div>
 
+        <x-input-error :messages="$errors->get('email')" class="mt-2 text-red-400 text-center" />
+
         <!-- Email Address -->
         <div>
             <x-input-label for="email" :value="__('Email')" class="text-zinc-300" />
@@ -21,7 +23,6 @@
                           name="email"
                           :value="old('email')"
                           required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2 text-red-400" />
         </div>
 
         <!-- Password -->
