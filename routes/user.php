@@ -14,3 +14,13 @@ Route::controller(ProfileController::class)->middleware(['auth'])->prefix('user'
     Route::delete('/profile', 'destroy')
         ->name('user.profile.destroy');
 });
+
+Route::controller(DashboardController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
+    Route::get('/dashboard', 'index')
+        ->name('user.dashboard');
+});
+
+Route::controller(ExpenseController::class)->middleware(['auth'])->prefix('user')->group(function() {
+    Route::get('/expenses', 'index')
+        ->name('user.expenses');
+});
