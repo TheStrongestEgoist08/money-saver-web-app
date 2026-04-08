@@ -69,7 +69,7 @@
                 @guest
                     <a href="{{ route('register') }}"
                        class="px-10 py-5 bg-emerald-600 hover:bg-emerald-700 text-lg font-semibold rounded-3xl transition-all active:scale-95 shadow-lg shadow-emerald-600/30">
-                        Get Started — It's Free
+                        Get Started Now
                     </a>
                 @endguest
 
