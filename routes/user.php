@@ -3,6 +3,9 @@
 use App\Http\Controllers\User\DashboardController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\User\ExpenseController;
+use App\Http\Controllers\User\BalanceController;
+use App\Http\Controllers\User\GoalsController;
+use App\Http\Controllers\User\ReportController;
 
 Route::controller(ProfileController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
     Route::get('/profile', 'edit')
