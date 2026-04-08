@@ -27,3 +27,18 @@ Route::controller(ExpenseController::class)->middleware(['auth', 'verified'])->p
     Route::get('/expenses', 'index')
         ->name('user.expenses');
 });
+
+Route::controller(BalanceController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
+    Route::get('/balance', 'index')
+        ->name('user.expenses');
+});
+
+Route::controller(GoalsController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
+    Route::get('/goals', 'index')
+        ->name('user.goals');
+});
+
+Route::controller(ReportController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
+    Route::get('/reports', 'index')
+        ->name('user.reports');
+});
