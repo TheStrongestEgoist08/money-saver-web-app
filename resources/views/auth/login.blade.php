@@ -1,9 +1,6 @@
 
 {{-- Login Form --}}
 <x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
-
     <form method="POST" action="{{ route('login') }}" class="space-y-4">
         @csrf
 
@@ -11,6 +8,9 @@
             <h2 class="text-2xl font-semibold tracking-tight text-white">Welcome Back</h2>
             <p class="text-zinc-400 text-sm">Log in to continue saving smarter</p>
         </div>
+
+        <!-- Session Status -->
+        <x-auth-session-status class="mt-2 text-center" :status="session('status')" />
 
         <x-input-error :messages="$errors->get('email')" class="mt-2 text-red-400 text-center" />
 
