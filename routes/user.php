@@ -30,7 +30,7 @@ Route::controller(ExpenseController::class)->middleware(['auth', 'verified'])->p
 
 Route::controller(BalanceController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
     Route::get('/balance', 'index')
-        ->name('user.expenses');
+        ->name('user.balance');
 });
 
 Route::controller(GoalsController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
