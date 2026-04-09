@@ -1,6 +1,6 @@
 
 {{-- Navigation Bar --}}
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+<nav x-data="{ open: false }" class="bg-zinc-950 border-b border-gray-100">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -8,37 +8,37 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('user.dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                        <x-application-logo class="block h-9 w-auto fill-current text-white" />
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('user.dashboard')" :active="request()->routeIs('user.dashboard')">
+                    <x-nav-link :href="route('user.dashboard')" :active="request()->routeIs('user.dashboard')" class="text-zinc-300 hover:text-white">
                         {{ __('Dashboard') }}
                     </x-nav-link>
                 </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('user.balance')" :active="request()->routeIs('user.balance')">
+                    <x-nav-link :href="route('user.balance')" :active="request()->routeIs('user.balance')" class="text-zinc-300 hover:text-white">
                         {{ __('Balance') }}
                     </x-nav-link>
                 </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('user.expenses')" :active="request()->routeIs('user.expenses')">
+                    <x-nav-link :href="route('user.expenses')" :active="request()->routeIs('user.expenses')" class="text-zinc-300 hover:text-white">
                         {{ __('Expenses') }}
                     </x-nav-link>
                 </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link>
+                    <x-nav-link class="text-zinc-300 hover:text-white">
                         {{ __('Goals') }}
                     </x-nav-link>
                 </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link>
+                    <x-nav-link class="text-zinc-300 hover:text-white">
                         {{ __('Report') }}
                     </x-nav-link>
                 </div>
