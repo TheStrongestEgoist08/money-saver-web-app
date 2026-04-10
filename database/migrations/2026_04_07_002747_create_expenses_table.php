@@ -14,7 +14,16 @@ return new class extends Migration
         Schema::create('expenses', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('description');
+            $table->string('expense_name', 50);
+            $table->enum('type', [
+                'Food',
+                'Transportation',
+                'Bills',
+                'Clothing',
+                'Entertainment',
+                'Others'
+            ]);
+            $table->text('description')->nullable();
             $table->decimal('amount', 10, 2);
             $table->timestamps();
 

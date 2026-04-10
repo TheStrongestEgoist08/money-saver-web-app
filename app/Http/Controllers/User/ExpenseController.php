@@ -22,8 +22,15 @@ class ExpenseController extends Controller
             return redirect()->route('login');
         }
 
+        $user_id = Auth::id();
+
         $validatedData = $request->validate([
-            'amount' => ['required', 'numeric', 'min:1'],
+            'name' => ['required', 'string', 'max:50'],
+            'type' => ['required'],
+            'amount' => ['required', 'numeric', 'min:1', 'max:50000'],
+            'description' => ['required', ''],
         ]);
+
+
     }
 }
