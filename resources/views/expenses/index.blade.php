@@ -1,98 +1,118 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800">
-            Expenses
+        <h2 class="font-semibold text-2xl text-gray-800 tracking-tight">
+            My Expenses
         </h2>
     </x-slot>
 
-    <div class="py-12"
+    <div class="py-10"
          x-data="{ openAdd: false, openView: false, selected: null }">
 
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-            <div class="bg-white shadow-sm rounded-lg p-6">
+            <div class="bg-white shadow-xl shadow-gray-100/50 rounded-3xl overflow-hidden">
 
-                <!-- Header -->
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-lg font-semibold text-gray-800">
-                        Expense List
-                    </h3>
+                <!-- Page Header -->
+                <div class="px-8 pt-8 pb-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                        <h3 class="text-2xl font-semibold text-gray-900">Expense List</h3>
+                        <p class="text-gray-500 mt-1">Track and manage your daily expenses</p>
+                    </div>
 
-                    <button @click="openAdd = true"
-                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-                        + Add Expense
+                    <button
+                        @click="openAdd = true"
+                        class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-2xl flex items-center gap-2 shadow-lg shadow-blue-200 transition-all active:scale-95">
+                        <span class="text-xl leading-none">+</span>
+                        Add New Expense
                     </button>
                 </div>
 
                 <!-- Flash Messages -->
-                @if(session('Success'))
-                    <div class="mb-4 p-3 bg-green-100 text-green-700 rounded">
-                        {{ session('Success') }}
-                    </div>
-                @endif
-
-                @if(session('Error'))
-                    <div class="mb-4 p-3 bg-red-100 text-red-700 rounded">
-                        {{ session('Error') }}
-                    </div>
-                @endif
-
-                <!-- Cards -->
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-
-                    @forelse($expenses as $expense)
-                        <div class="border rounded-lg p-4 shadow-sm hover:shadow-md transition">
-
-                            <div class="flex justify-between items-center mb-2">
-                                <h4 class="font-semibold text-gray-800 truncate">
-                                    {{ $expense->expense_name }}
-                                </h4>
-
-                                <span class="text-red-500 font-bold">
-                                    ₱{{ number_format($expense->total, 2) }}
-                                </span>
-                            </div>
-
-                            <div class="text-sm text-blue-600 mb-3">
-                                {{ $expense->type }}
-                            </div>
-
-                            <button
-                                @click="
-                                    selected = {
-                                        name: '{{ $expense->expense_name }}',
-                                        type: '{{ $expense->type }}',
-                                        quantity: '{{ $expense->quantity ?? 1 }}',
-                                        price: '{{ number_format($expense->price, 2) }}',
-                                        total: '{{ number_format($expense->total, 2) }}',
-                                        description: '{{ $expense->description ?? 'No description' }}',
-                                        date: '{{ $expense->created_at->format('M d, Y') }}'
-                                    };
-                                    openView = true;
-                                "
-                                class="text-sm text-blue-500 hover:underline">
-                                View Details
-                            </button>
-
+                <div class="px-8 pt-6">
+                    @if(session('Success'))
+                        <div class="mb-6 p-4 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-2xl flex items-center gap-3">
+                            <span class="text-xl">✅</span>
+                            <span>{{ session('Success') }}</span>
                         </div>
-                    @empty
-                        <div class="col-span-3 text-center text-gray-500 py-10">
-                            No expenses yet.
-                        </div>
-                    @endforelse
+                    @endif
 
+                    @if(session('Error'))
+                        <div class="mb-6 p-4 bg-red-50 border border-red-100 text-red-700 rounded-2xl flex items-center gap-3">
+                            <span class="text-xl">⚠️</span>
+                            <span>{{ session('Error') }}</span>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Expense Cards -->
+                <div class="p-8">
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                        @forelse($expenses as $expense)
+                            <div class="group bg-white border border-gray-200 hover:border-blue-200 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300">
+
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="flex-1">
+                                        <h4 class="font-semibold text-lg text-gray-900 line-clamp-1">
+                                            {{ $expense->expense_name }}
+                                        </h4>
+                                        <p class="text-blue-600 font-medium text-sm mt-1">
+                                            {{ $expense->type }}
+                                        </p>
+                                    </div>
+
+                                    <div class="text-right">
+                                        <span class="block text-2xl font-bold text-red-600">
+                                            ₱{{ number_format($expense->total, 2) }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="text-xs text-gray-500 mb-5">
+                                    {{ $expense->created_at->format('M d, Y') }}
+                                </div>
+
+                                <button
+                                    @click="
+                                        selected = {
+                                            name: '{{ addslashes($expense->expense_name) }}',
+                                            type: '{{ addslashes($expense->type) }}',
+                                            quantity: '{{ $expense->quantity ?? 1 }}',
+                                            price: '{{ number_format($expense->price, 2) }}',
+                                            total: '{{ number_format($expense->total, 2) }}',
+                                            description: '{{ addslashes($expense->description ?? 'No description provided.') }}',
+                                            date: '{{ $expense->created_at->format('M d, Y') }}'
+                                        };
+                                        openView = true;
+                                    "
+                                    class="w-full py-3 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-2xl transition-all group-hover:text-blue-700">
+                                    View Details →
+                                </button>
+                            </div>
+                        @empty
+                            <div class="col-span-full text-center py-20">
+                                <div class="text-6xl mb-4 opacity-30">📭</div>
+                                <p class="text-gray-400 text-xl">No expenses recorded yet</p>
+                                <p class="text-gray-500 mt-2">Click "Add New Expense" to get started</p>
+                            </div>
+                        @endforelse
+
+                    </div>
                 </div>
 
                 <!-- Pagination -->
-                <div class="mt-6">
-                    {{ $expenses->links() }}
-                </div>
+                @if($expenses->hasPages())
+                    <div class="px-8 py-6 border-t border-gray-100 bg-gray-50">
+                        <div class="flex justify-center">
+                            {{ $expenses->links() }}
+                        </div>
+                    </div>
+                @endif
 
             </div>
-
         </div>
 
-        <!-- ✅ INCLUDE MODALS -->
+        <!-- Modals -->
         @include('expenses.partials.add-modal')
         @include('expenses.partials.view-modal')
 
