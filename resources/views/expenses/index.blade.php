@@ -1,4 +1,3 @@
-
 {{-- Expense Page --}}
 <x-app-layout>
     <x-slot name="header">
@@ -12,10 +11,38 @@
             openAdd: false,
             openView: false,
             selected: null,
+
             search: '',
             filterType: '',
             dateFrom: '',
-            dateTo: ''
+            dateTo: '',
+
+            showNoResults: false,
+
+            // Watch for filter changes and update no results message
+            init() {
+                this.$watch(() => [this.search, this.filterType, this.dateFrom, this.dateTo], () => {
+                    this.$nextTick(() => {
+                        this.updateNoResults();
+                    });
+                });
+            },
+
+            updateNoResults() {
+                const cards = document.querySelectorAll('.expense-card');
+                let visible = 0;
+                cards.forEach(card => {
+                    if (card.style.display !== 'none') visible++;
+                });
+                this.showNoResults = visible === 0 && cards.length > 0;
+            },
+
+            clearAllFilters() {
+                this.search = '';
+                this.filterType = '';
+                this.dateFrom = '';
+                this.dateTo = '';
+            }
          }">
 
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -75,16 +102,16 @@
                                 class="w-full px-5 py-3.5 bg-white border border-gray-200 rounded-2xl focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all">
                         </div>
 
-                        <!-- Date To -->
+                        <!-- Date To + Clear -->
                         <div class="flex items-center gap-2">
                             <input
                                 type="date"
                                 x-model="dateTo"
                                 class="flex-1 px-5 py-3.5 bg-white border border-gray-200 rounded-2xl focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all">
                             <button
-                                @click="dateFrom = ''; dateTo = ''"
-                                class="px-5 py-3.5 text-sm font-medium text-gray-500 hover:text-red-600 transition-colors">
-                                Clear
+                                @click="clearAllFilters"
+                                class="px-6 py-3.5 text-sm font-medium text-gray-500 hover:text-red-600 transition-colors whitespace-nowrap">
+                                Clear All
                             </button>
                         </div>
                     </div>
@@ -107,7 +134,7 @@
                     @endif
                 </div>
 
-                <!-- Main Content Area -->
+                <!-- Main Content -->
                 <div class="p-8">
 
                     <!-- Expense Cards -->
@@ -115,13 +142,14 @@
 
                         @forelse($expenses as $expense)
                             <div
-                                class="group bg-white border border-gray-200 hover:border-blue-200 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300"
+                                class="expense-card group bg-white border border-gray-200 hover:border-blue-200 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300"
                                 x-show="
                                     (search === '' || '{{ strtolower(addslashes($expense->expense_name)) }}'.includes(search.toLowerCase())) &&
                                     (filterType === '' || '{{ $expense->type }}' === filterType) &&
                                     (!dateFrom || '{{ $expense->created_at->format('Y-m-d') }}' >= dateFrom) &&
                                     (!dateTo || '{{ $expense->created_at->format('Y-m-d') }}' <= dateTo)
-                                ">
+                                "
+                                x-transition>
 
                                 <div class="flex justify-between items-start mb-4">
                                     <div class="flex-1">
@@ -170,19 +198,16 @@
 
                     </div>
 
-                    <!-- No Matching Results Message -->
+                    <!-- No Matching Results -->
                     <div
                         class="text-center py-20"
-                        x-show="
-                            @php echo count($expenses) > 0 @endphp &&
-                            document.querySelectorAll('.group[x-show]').length === 0
-                        ">
+                        x-show="showNoResults">
                         <div class="text-6xl mb-6 opacity-40">😕</div>
                         <p class="text-xl text-gray-400 font-medium">No matching expenses found</p>
                         <p class="text-gray-500 mt-2">Try changing your search term or filters</p>
 
                         <button
-                            @click="search = ''; filterType = ''; dateFrom = ''; dateTo = ''"
+                            @click="clearAllFilters"
                             class="mt-6 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl font-medium transition-colors">
                             Clear All Filters
                         </button>
