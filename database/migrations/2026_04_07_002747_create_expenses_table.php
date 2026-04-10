@@ -23,8 +23,10 @@ return new class extends Migration
                 'Entertainment',
                 'Others'
             ]);
+            $table->unsignedInteger('quantity')->nullable();
+            $table->decimal('price', 10, 2);
+            $table->decimal('total', 10, 2);
             $table->text('description')->nullable();
-            $table->decimal('amount', 10, 2);
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

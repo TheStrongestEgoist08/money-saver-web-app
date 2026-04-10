@@ -29,6 +29,9 @@ Route::controller(DashboardController::class)->middleware(['auth', 'verified'])-
 Route::controller(ExpenseController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
     Route::get('/expenses', 'index')
         ->name('user.expenses');
+
+    Route::post('/expenses/add', 'addExpenses')
+        ->name('user.expenses.add');
 });
 
 # balance route
