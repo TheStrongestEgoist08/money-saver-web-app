@@ -23,9 +23,7 @@
             init() {
                 this.$watch(() => [this.search, this.filterType, this.dateFrom, this.dateTo], () => {
                     this.$nextTick(() => {
-                        this.$nextTick(() => {
-                            this.updateNoResults();
-                        });
+                        this.updateNoResults();
                     });
                 });
             },
