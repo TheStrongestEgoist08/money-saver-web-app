@@ -20,7 +20,7 @@ class ExpenseController extends Controller
 
         $expenses = Expense::where('user_id', auth()->id())
             ->latest()
-            ->paginate(5);
+            ->paginate(15);
 
         return view('expenses.index', [
             'expenses' => $expenses,

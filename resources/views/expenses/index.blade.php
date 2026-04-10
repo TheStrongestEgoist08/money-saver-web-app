@@ -23,17 +23,22 @@
             init() {
                 this.$watch(() => [this.search, this.filterType, this.dateFrom, this.dateTo], () => {
                     this.$nextTick(() => {
-                        this.updateNoResults();
+                        this.$nextTick(() => {
+                            this.updateNoResults();
+                        });
                     });
                 });
             },
 
             updateNoResults() {
                 const cards = document.querySelectorAll('.expense-card');
+
                 let visible = 0;
+
                 cards.forEach(card => {
                     if (card.style.display !== 'none') visible++;
                 });
+
                 this.showNoResults = visible === 0 && cards.length > 0;
             },
 
