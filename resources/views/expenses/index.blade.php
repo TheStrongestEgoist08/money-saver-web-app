@@ -171,7 +171,7 @@
                                 </div>
 
                                 <div class="text-xs text-gray-500 mb-5">
-                                    {{ $expense->created_at->format('M d, Y') }}
+                                    {{ $expense->created_at->format('M d, Y • h:i A') }}
                                 </div>
 
                                 <button
@@ -183,7 +183,7 @@
                                             price: '{{ number_format($expense->price, 2) }}',
                                             total: '{{ number_format($expense->total, 2) }}',
                                             description: '{{ addslashes($expense->description ?? 'No description provided.') }}',
-                                            date: '{{ $expense->created_at->format('M d, Y') }}'
+                                            date: '{{ $expense->created_at->format('M d, Y • h:i A') }}'
                                         };
                                         openView = true;
                                     "
