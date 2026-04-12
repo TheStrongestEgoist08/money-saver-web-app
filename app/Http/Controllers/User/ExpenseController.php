@@ -27,7 +27,8 @@ class ExpenseController extends Controller
         ]);
     }
 
-    public function addExpensess(Request $request) {
+    public function addExpenses(Request $request)
+    {
         if (!Auth::check()) {
             return redirect()->route('login');
         }
@@ -35,106 +36,55 @@ class ExpenseController extends Controller
         $user = Auth::user();
 
         $validatedData = $request->validate([
-            'expense_name' => ['required', 'string', 'max:50'],
-            'type' => ['required'],
-            'quantity' => ['nullable', 'integer', 'min:1'],
-            'price' => ['required', 'numeric', 'min:1'],
-            'description' => ['nullable', 'string'],
+            'expenses' => ['required', 'array', 'min:1'],
+            'expenses.*.expense_name' => ['required', 'string', 'max:50'],
+            'expenses.*.type' => ['required', 'string'],
+            'expenses.*.quantity' => ['nullable', 'integer', 'min:1'],
+            'expenses.*.price' => ['required', 'numeric', 'min:0.01'],
+            'expenses.*.description' => ['nullable', 'string', 'max:500'],
         ]);
 
-        $quantity = $validatedData['quantity'] ?? 1;
+        $totalAllExpenses = 0;
+        $expensesToCreate = [];
 
-        // compute total
-        $total = $quantity * $validatedData['price'];
+        foreach ($validatedData['expenses'] as $expense) {
+            $quantity = $expense['quantity'] ?? 1;
+            $price    = $expense['price'];
+            $total    = $quantity * $price;
 
-        if ($user->balance < $total) {
+            $totalAllExpenses += $total;
+
+            $expensesToCreate[] = [
+                'user_id'      => $user->id,
+                'expense_name' => $expense['expense_name'],
+                'type'         => $expense['type'],
+                'quantity'     => $quantity,
+                'price'        => $price,
+                'total'        => $total,
+                'description'  => $expense['description'] ?? null,
+                'created_at'   => now(),
+                'updated_at'   => now(),
+            ];
+        }
+
+        if ($user->balance < $totalAllExpenses) {
             return Redirect::back()->with('Error', 'Insufficient Balance');
         }
 
         try {
             DB::beginTransaction();
 
-            Expense::create([
-                'user_id' => $user->id,
-                'expense_name' => $validatedData['expense_name'],
-                'type' => $validatedData['type'],
-                'quantity' => $quantity,
-                'price' => $validatedData['price'],
-                'total' => $total,
-                'description' => $validatedData['description'],
-            ]);
-
-            // deduct balance
-            $user->decrement('balance', $total);
+            Expense::insert($expensesToCreate);
+            $user->decrement('balance', $totalAllExpenses);
 
             DB::commit();
 
-            return Redirect::back()->with('Success', 'Expense Added Successfully');
+            return Redirect::back()->with('Success', count($expensesToCreate) . ' Expense(s) Added Successfully');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return Redirect::back()->with('Error', $e->getMessage());
+
+            return Redirect::back()->with('Error', 'Something went wrong. Please try again.');
         }
     }
-
-public function addExpenses(Request $request)
-{
-    if (!Auth::check()) {
-        return redirect()->route('login');
-    }
-
-    $user = Auth::user();
-
-    $validatedData = $request->validate([
-        'expenses' => ['required', 'array', 'min:1'],
-        'expenses.*.expense_name' => ['required', 'string', 'max:50'],
-        'expenses.*.type' => ['required', 'string'],
-        'expenses.*.quantity' => ['nullable', 'integer', 'min:1'],
-        'expenses.*.price' => ['required', 'numeric', 'min:0.01'],
-        'expenses.*.description' => ['nullable', 'string', 'max:500'],
-    ]);
-
-    $totalAllExpenses = 0;
-    $expensesToCreate = [];
-
-    foreach ($validatedData['expenses'] as $expense) {
-        $quantity = $expense['quantity'] ?? 1;
-        $price    = $expense['price'];
-        $total    = $quantity * $price;
-
-        $totalAllExpenses += $total;
-
-        $expensesToCreate[] = [
-            'user_id'      => $user->id,
-            'expense_name' => $expense['expense_name'],
-            'type'         => $expense['type'],
-            'quantity'     => $quantity,
-            'price'        => $price,
-            'total'        => $total,
-            'description'  => $expense['description'] ?? null,
-            'created_at'   => now(),
-            'updated_at'   => now(),
-        ];
-    }
-
-    if ($user->balance < $totalAllExpenses) {
-        return Redirect::back()->with('Error', 'Insufficient Balance');
-    }
-
-    try {
-        DB::beginTransaction();
-
-        Expense::insert($expensesToCreate);
-        $user->decrement('balance', $totalAllExpenses);
-
-        DB::commit();
-
-        return Redirect::back()->with('Success', count($expensesToCreate) . ' Expense(s) Added Successfully');
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-
-        return Redirect::back()->with('Error', 'Something went wrong. Please try again.');
-    }
-}
 }
