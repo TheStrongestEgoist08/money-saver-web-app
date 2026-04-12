@@ -133,6 +133,7 @@ public function addExpenses(Request $request)
 
     } catch (\Exception $e) {
         DB::rollBack();
+
         return Redirect::back()->with('Error', 'Something went wrong. Please try again.');
     }
 }
