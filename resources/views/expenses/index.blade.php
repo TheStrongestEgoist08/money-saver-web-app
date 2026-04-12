@@ -89,10 +89,20 @@
                                 class="w-full px-5 py-3.5 bg-white border border-gray-200 rounded-2xl focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all">
                                 <option value="">All Categories</option>
                                 <option value="Food">🍔 Food</option>
+                                <option value="Groceries">🛒 Groceries</option>
                                 <option value="Transportation">🚕 Transportation</option>
                                 <option value="Bills">📄 Bills</option>
+                                <option value="Utilities">💡 Utilities</option>
+                                <option value="Personal Care">🧼 Personal Care</option>
+                                <option value="Household">🧽 Household</option>
+                                <option value="Health">💊 Health</option>
                                 <option value="Clothing">👕 Clothing</option>
                                 <option value="Entertainment">🎮 Entertainment</option>
+                                <option value="Education">📚 Education</option>
+                                <option value="Savings">💰 Savings</option>
+                                <option value="Gifts">🎁 Gifts</option>
+                                <option value="Maintenance">🔧 Maintenance</option>
+                                <option value="Subscriptions">📱 Subscriptions</option>
                                 <option value="Others">📌 Others</option>
                             </select>
                         </div>
@@ -226,7 +236,6 @@
                         </div>
                     </div>
                 @endif
-
             </div>
         </div>
 

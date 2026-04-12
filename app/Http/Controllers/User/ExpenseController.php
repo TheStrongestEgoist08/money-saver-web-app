@@ -88,7 +88,7 @@ public function addExpenses(Request $request)
     $validatedData = $request->validate([
         'expenses' => ['required', 'array', 'min:1'],
         'expenses.*.expense_name' => ['required', 'string', 'max:50'],
-        'expenses.*.type' => ['required', 'string', 'in:Food,Transportation,Bills,Clothing,Entertainment,Others'],
+        'expenses.*.type' => ['required', 'string'],
         'expenses.*.quantity' => ['nullable', 'integer', 'min:1'],
         'expenses.*.price' => ['required', 'numeric', 'min:0.01'],
         'expenses.*.description' => ['nullable', 'string', 'max:500'],

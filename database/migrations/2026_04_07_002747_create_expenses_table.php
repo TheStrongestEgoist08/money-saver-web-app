@@ -17,10 +17,20 @@ return new class extends Migration
             $table->string('expense_name', 50);
             $table->enum('type', [
                 'Food',
+                'Groceries',
                 'Transportation',
                 'Bills',
+                'Utilities',
+                'Personal Care',
+                'Household',
+                'Health',
                 'Clothing',
                 'Entertainment',
+                'Education',
+                'Savings',
+                'Gifts',
+                'Maintenance',
+                'Subscriptions',
                 'Others'
             ]);
             $table->unsignedInteger('quantity')->nullable();

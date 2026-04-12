@@ -85,10 +85,20 @@
                                 required>
                                 <option value="">Select Category</option>
                                 <option value="Food">🍔 Food</option>
+                                <option value="Groceries">🛒 Groceries</option>
                                 <option value="Transportation">🚕 Transportation</option>
                                 <option value="Bills">📄 Bills</option>
+                                <option value="Utilities">💡 Utilities</option>
+                                <option value="Personal Care">🧼 Personal Care</option>
+                                <option value="Household">🧽 Household</option>
+                                <option value="Health">💊 Health</option>
                                 <option value="Clothing">👕 Clothing</option>
                                 <option value="Entertainment">🎮 Entertainment</option>
+                                <option value="Education">📚 Education</option>
+                                <option value="Savings">💰 Savings</option>
+                                <option value="Gifts">🎁 Gifts</option>
+                                <option value="Maintenance">🔧 Maintenance</option>
+                                <option value="Subscriptions">📱 Subscriptions</option>
                                 <option value="Others">📌 Others</option>
                             </select>
 

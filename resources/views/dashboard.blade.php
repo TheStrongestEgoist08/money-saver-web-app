@@ -180,8 +180,10 @@
                         label: 'Amount Spent',
                         data: @json($categoryAmounts ?? []),
                         backgroundColor: [
-                            '#ef4444', '#f59e0b', '#10b981', '#3b82f6',
-                            '#8b5cf6', '#ec4899', '#64748b'
+                            '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', '#22c55e',
+                            '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9', '#3b82f6', '#6366f1',
+                            '#8b5cf6', '#a855f7', '#d946ef', '#ec4899', '#f43f5e', '#64748b',
+                            '#6b7280', '#1f2937'
                         ],
                         borderColor: '#ffffff',
                         borderWidth: 2,
@@ -225,7 +227,7 @@
                     },
                     plugins: {
                         legend: {
-                            display: true,
+                            display: false,
                             position: 'top',
                             align: 'start',
                             labels: {

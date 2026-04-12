@@ -59,7 +59,7 @@ class DashboardController extends Controller
             'categoryLabels',
             'categoryAmounts',
             'topExpenseCategory',
-            'topExpenseAmount'     
+            'topExpenseAmount'
         ));
     }
 }
