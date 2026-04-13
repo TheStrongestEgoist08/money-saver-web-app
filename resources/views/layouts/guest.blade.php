@@ -24,9 +24,7 @@
 
             <div class="flex justify-center mb-5">
                 <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-emerald-600 rounded-3xl flex items-center justify-center text-3xl font-bold shadow-lg">
-                        ₱
-                    </div>
+                    <x-application-logo class="block h-9 w-auto fill-current text-green-500 bg-white rounded-full" />
                     <span class="font-semibold text-3xl tracking-tighter">MoneyTrackr</span>
                 </div>
             </div>
