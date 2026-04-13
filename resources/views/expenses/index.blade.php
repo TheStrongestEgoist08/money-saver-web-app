@@ -6,8 +6,9 @@
         </h2>
     </x-slot>
 
-    <div class="py-10"
-         x-data="{
+    <div
+        class="py-10"
+        x-data="{
             openAdd: false,
             openView: false,
             selected: null,
@@ -46,8 +47,8 @@
                 this.dateFrom = '';
                 this.dateTo = '';
             }
-         }">
-
+         }"
+    >
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             <!-- Modern Pie Chart Section -->
