@@ -147,10 +147,20 @@
                                         <div class="w-10 h-10 bg-gray-100 rounded-2xl flex items-center justify-center text-xl flex-shrink-0">
                                             @switch($expense->type)
                                                 @case('Food') 🍔 @break
+                                                @case('Groceries') 🛒 @break
                                                 @case('Transportation') 🚕 @break
                                                 @case('Bills') 📄 @break
+                                                @case('Utilities') 💡 @break
+                                                @case('Personal Care') 🧼 @break
+                                                @case('Household') 🧽 @break
+                                                @case('Health') 💊 @break
                                                 @case('Clothing') 👕 @break
                                                 @case('Entertainment') 🎮 @break
+                                                @case('Education') 📚 @break
+                                                @case('Savings') 💰 @break
+                                                @case('Gifts') 🎁 @break
+                                                @case('Maintenance') 🔧 @break
+                                                @case('Subscriptions') 📱 @break
                                                 @case('Others') 📌 @break
                                                 @default 📦
                                             @endswitch

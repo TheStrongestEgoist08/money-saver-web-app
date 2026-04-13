@@ -117,30 +117,81 @@
 
                 <!-- Main Content -->
                 <div class="p-8">
-
                     <!-- Expense Cards -->
                     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
                         @forelse($expenses as $expense)
                             <div
-                                class="expense-card group bg-white border border-gray-200 hover:border-blue-200 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300"
-                                x-show="
-                                    (search === '' || '{{ strtolower(addslashes($expense->expense_name)) }}'.includes(search.toLowerCase())) &&
-                                    (filterType === '' || '{{ $expense->type }}' === filterType) &&
-                                    (!dateFrom || '{{ $expense->created_at->format('Y-m-d') }}' >= dateFrom) &&
-                                    (!dateTo || '{{ $expense->created_at->format('Y-m-d') }}' <= dateTo)
-                                "
+                                class="expense-card group relative bg-white border border-gray-200 hover:border-blue-200 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
+                                x-show="..."
                                 x-transition>
 
-                                <div class="flex justify-between items-start mb-4">
-                                    <div class="flex-1">
-                                        <h4 class="font-semibold text-lg text-gray-900 line-clamp-1">
-                                            {{ $expense->expense_name }}
-                                        </h4>
-                                        <p class="text-blue-600 font-medium text-sm mt-1">
-                                            {{ $expense->type }}
-                                        </p>
+                                <!-- Repetitive Emoji Background Pattern -->
+                                <div class="absolute inset-0 opacity-10 group-hover:opacity-15 transition-all duration-500 pointer-events-none overflow-hidden">
+                                    <div class="absolute inset-0 flex flex-wrap justify-around items-center gap-6 text-5xl rotate-[-8deg]">
+                                        @for($i = 0; $i < 12; $i++)
+                                            <span class="transition-all duration-700"
+                                                style="transform: rotate({{ rand(-25, 25) }}deg);">
+                                                @switch($expense->type)
+                                                    @case('Food') 🍔 @break
+                                                    @case('Groceries') 🛒 @break
+                                                    @case('Transportation') 🚕 @break
+                                                    @case('Bills') 📄 @break
+                                                    @case('Utilities') 💡 @break
+                                                    @case('Personal Care') 🧼 @break
+                                                    @case('Household') 🧽 @break
+                                                    @case('Health') 💊 @break
+                                                    @case('Clothing') 👕 @break
+                                                    @case('Entertainment') 🎮 @break
+                                                    @case('Education') 📚 @break
+                                                    @case('Savings') 💰 @break
+                                                    @case('Gifts') 🎁 @break
+                                                    @case('Maintenance') 🔧 @break
+                                                    @case('Subscriptions') 📱 @break
+                                                    @case('Others') 📌 @break
+                                                    @default 📦
+                                                @endswitch
+                                            </span>
+                                        @endfor
                                     </div>
+                                </div>
+
+                                <!-- Main Content -->
+                                <div class="relative z-10 flex justify-between items-start mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <!-- Big Emoji Icon -->
+                                        <div class="w-14 h-14 flex items-center justify-center text-5xl bg-white border border-gray-100 rounded-2xl shadow-sm flex-shrink-0">
+                                            @switch($expense->type)
+                                                @case('Food') 🍔 @break
+                                                @case('Groceries') 🛒 @break
+                                                @case('Transportation') 🚕 @break
+                                                @case('Bills') 📄 @break
+                                                @case('Utilities') 💡 @break
+                                                @case('Personal Care') 🧼 @break
+                                                @case('Household') 🧽 @break
+                                                @case('Health') 💊 @break
+                                                @case('Clothing') 👕 @break
+                                                @case('Entertainment') 🎮 @break
+                                                @case('Education') 📚 @break
+                                                @case('Savings') 💰 @break
+                                                @case('Gifts') 🎁 @break
+                                                @case('Maintenance') 🔧 @break
+                                                @case('Subscriptions') 📱 @break
+                                                @case('Others') 📌 @break
+                                                @default 📦
+                                            @endswitch
+                                        </div>
+
+                                        <div>
+                                            <h4 class="font-semibold text-lg text-gray-900 line-clamp-1">
+                                                {{ $expense->expense_name }}
+                                            </h4>
+                                            <p class="text-blue-600 font-medium text-sm">
+                                                {{ $expense->type }}
+                                            </p>
+                                        </div>
+                                    </div>
+
                                     <div class="text-right">
                                         <span class="block text-2xl font-bold text-red-600">
                                             ₱{{ number_format($expense->total, 2) }}
@@ -148,7 +199,7 @@
                                     </div>
                                 </div>
 
-                                <div class="text-xs text-gray-500 mb-5">
+                                <div class="text-xs text-gray-500 mb-5 relative z-10">
                                     {{ $expense->created_at->format('M d, Y • h:i A') }}
                                 </div>
 
@@ -165,16 +216,12 @@
                                         };
                                         openView = true;
                                     "
-                                    class="w-full py-3 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-2xl transition-all group-hover:text-blue-700">
+                                    class="w-full py-3 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-2xl transition-all group-hover:text-blue-700 relative z-10">
                                     View Details →
                                 </button>
                             </div>
                         @empty
-                            <div class="col-span-full text-center py-20">
-                                <div class="text-6xl mb-4 opacity-30">📭</div>
-                                <p class="text-gray-400 text-xl">No expenses recorded yet</p>
-                                <p class="text-gray-500 mt-2">Click "Add New Expense" to get started</p>
-                            </div>
+                            ... (your empty state)
                         @endforelse
 
                     </div>
