@@ -106,7 +106,7 @@
                     <div class="w-12 h-12 bg-emerald-600/10 text-emerald-500 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-6">1</div>
                     <h3 class="text-xl font-semibold mb-3">Track Every Peso</h3>
                     <p class="text-zinc-400">
-                        Quickly add your daily expenses and income.
+                        Quickly add your daily expenses and balance.
                         See where your money is going in real-time.
                     </p>
                 </div>
@@ -124,10 +124,10 @@
                 <!-- Step 3 -->
                 <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-8 text-center">
                     <div class="w-12 h-12 bg-emerald-600/10 text-emerald-500 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-6">3</div>
-                    <h3 class="text-xl font-semibold mb-3">Watch Your Money Grow</h3>
+                    <h3 class="text-xl font-semibold mb-3">Watch Your Spending Habits</h3>
                     <p class="text-zinc-400">
-                        Get monthly summaries and celebrate your progress.
-                        Saving becomes easier and more rewarding.
+                        This app helps you track where you frequently spend your money,
+                        making it easier to understand your habits and stay in control.
                     </p>
                 </div>
             </div>
