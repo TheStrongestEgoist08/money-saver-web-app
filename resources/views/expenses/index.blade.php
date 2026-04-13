@@ -1,4 +1,3 @@
-
 {{-- Expense Page --}}
 <x-app-layout>
     <x-slot name="header">
@@ -20,6 +19,7 @@
 
             showNoResults: false,
 
+            // Watch for filter changes and update no results message
             init() {
                 this.$watch(() => [this.search, this.filterType, this.dateFrom, this.dateTo], () => {
                     this.$nextTick(() => {
@@ -30,10 +30,13 @@
 
             updateNoResults() {
                 const cards = document.querySelectorAll('.expense-card');
+
                 let visible = 0;
+
                 cards.forEach(card => {
                     if (card.style.display !== 'none') visible++;
                 });
+
                 this.showNoResults = visible === 0 && cards.length > 0;
             },
 
@@ -77,7 +80,6 @@
                 </div>
             </div>
 
-            <!-- Main Expense List Card -->
             <div class="bg-white shadow-xl shadow-gray-100/50 rounded-3xl overflow-hidden">
 
                 <!-- Page Header -->
@@ -117,13 +119,19 @@
 
                 <!-- Main Content -->
                 <div class="p-8">
+
                     <!-- Expense Cards -->
                     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
                         @forelse($expenses as $expense)
                             <div
                                 class="expense-card group relative bg-white border border-gray-200 hover:border-blue-200 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
-                                x-show="..."
+                                x-show="
+                                    (search === '' || '{{ strtolower(addslashes($expense->expense_name)) }}'.includes(search.toLowerCase())) &&
+                                    (filterType === '' || '{{ $expense->type }}' === filterType) &&
+                                    (!dateFrom || '{{ $expense->created_at->format('Y-m-d') }}' >= dateFrom) &&
+                                    (!dateTo || '{{ $expense->created_at->format('Y-m-d') }}' <= dateTo)
+                                "
                                 x-transition>
 
                                 <!-- Repetitive Emoji Background Pattern -->
@@ -221,7 +229,11 @@
                                 </button>
                             </div>
                         @empty
-                            ... (your empty state)
+                            <div class="col-span-full text-center py-20">
+                                <div class="text-6xl mb-4 opacity-30">📭</div>
+                                <p class="text-gray-400 text-xl">No expenses recorded yet</p>
+                                <p class="text-gray-500 mt-2">Click "Add New Expense" to get started</p>
+                            </div>
                         @endforelse
 
                     </div>
@@ -251,13 +263,13 @@
                         </div>
                     </div>
                 @endif
+
             </div>
         </div>
 
         <!-- Modals -->
         @include('expenses.partials.add-modal')
         @include('expenses.partials.view-modal')
-
     </div>
 
     <script>
