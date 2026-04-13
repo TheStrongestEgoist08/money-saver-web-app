@@ -96,6 +96,14 @@
             <x-responsive-nav-link :href="route('user.dashboard')" :active="request()->routeIs('user.dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('user.balance')" :active="request()->routeIs('user.balance')">
+                {{ __('Balance') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('user.expenses')" :active="request()->routeIs('user.expenses')">
+                {{ __('Expenses') }}
+            </x-responsive-nav-link>
         </div>
 
         <!-- Responsive Settings Options -->

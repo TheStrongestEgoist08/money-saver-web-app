@@ -20,7 +20,7 @@ class ExpenseController extends Controller
 
         $expenses = Expense::where('user_id', auth()->id())
             ->latest()
-            ->paginate(15);
+            ->paginate(30);
 
         $categoryData = Expense::where('user_id', auth()->id())
             ->selectRaw('type, SUM(total) as total_amount')
@@ -83,7 +83,8 @@ class ExpenseController extends Controller
         }
 
         if ($user->balance < $totalAllExpenses) {
-            return Redirect::back()->with('Error', 'Insufficient Balance');
+            return Redirect::back()
+                ->with('Error', 'Insufficient Balance');
         }
 
         try {
@@ -94,12 +95,14 @@ class ExpenseController extends Controller
 
             DB::commit();
 
-            return Redirect::back()->with('Success', count($expensesToCreate) . ' Expense(s) Added Successfully');
+            return Redirect::back()
+                ->with('Success', count($expensesToCreate) . ' Expense(s) Added Successfully');
 
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return Redirect::back()->with('Error', 'Something went wrong. Please try again.');
+            return Redirect::back()
+                ->with('Error', 'Something went wrong. Please try again.');
         }
     }
 }
