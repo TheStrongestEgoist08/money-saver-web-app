@@ -22,8 +22,23 @@ class ExpenseController extends Controller
             ->latest()
             ->paginate(15);
 
+        $categoryData = Expense::where('user_id', auth()->id())
+            ->selectRaw('type, SUM(total) as total_amount')
+            ->groupBy('type')
+            ->orderBy('total_amount', 'desc')
+            ->get();
+
+        $categoryLabels = $categoryData->pluck('type');
+        $categoryAmounts = $categoryData->pluck('total_amount');
+
+        $totalExpense = Expense::where('user_id', auth()->id())
+            ->sum('total');
+
         return view('expenses.index', [
             'expenses' => $expenses,
+            'categoryLabels' => $categoryLabels,
+            'categoryAmounts' => $categoryAmounts,
+            'totalExpense' => $totalExpense,
         ]);
     }
 
