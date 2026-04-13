@@ -24,7 +24,7 @@
 
             <div class="flex items-center gap-2 sm:gap-3 min-w-0">
                 <div class="w-8 h-8 sm:w-10 sm:h-10 bg-emerald-600 rounded-2xl flex items-center justify-center text-lg sm:text-2xl font-bold">₱</div>
-                <span class="font-semibold text-xl sm:text-3xl tracking-tighter truncate">MoneySaver</span>
+                <span class="font-semibold text-xl sm:text-3xl tracking-tighter truncate">MoneyTrackr</span>
             </div>
 
             @if (Route::has('login'))
@@ -53,16 +53,15 @@
 
             <div class="inline-flex items-center gap-2 bg-zinc-900 border border-emerald-800 px-5 py-2 rounded-3xl text-sm text-emerald-400">
                 <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                Simple Savings for Everyone
+                Simple Expense Tracking App for Everyone
             </div>
 
             <h1 class="text-5xl lg:text-6xl font-semibold leading-tight tracking-tighter">
-                Save money without the stress
+                Simple money tracking, no stress.
             </h1>
 
             <p class="text-xl text-zinc-400">
-                Easily track your expenses, set realistic saving goals, and watch your money grow every day.
-                Made simple for real life.
+                Track your money, monitor your spending, and see where it all goes—made simple for real life.
             </p>
 
             <!-- Main CTA Buttons -->
