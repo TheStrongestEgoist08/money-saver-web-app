@@ -1,7 +1,7 @@
-
 <!-- Filters Bar -->
 <div class="px-8 py-6 border-b border-gray-100 bg-gray-50">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
         <!-- Search -->
         <div>
             <div class="relative">
@@ -39,20 +39,14 @@
             </select>
         </div>
 
-        <!-- Date From -->
-        <div>
-            <input
-                type="date"
-                x-model="dateFrom"
-                class="w-full px-5 py-3.5 bg-white border border-gray-200 rounded-2xl focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all">
-        </div>
-
-        <!-- Date To + Clear -->
+        <!-- Flatpickr Date Range -->
         <div class="flex items-center gap-2">
             <input
-                type="date"
-                x-model="dateTo"
-                class="flex-1 px-5 py-3.5 bg-white border border-gray-200 rounded-2xl focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all">
+                x-ref="datePicker"
+                type="text"
+                placeholder="Select date or range..."
+                class="w-full px-5 py-3.5 bg-white border border-gray-200 rounded-2xl focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all">
+
             <button
                 @click="clearAllFilters"
                 class="px-6 py-3.5 text-sm font-medium text-gray-500 hover:text-red-600 transition-colors whitespace-nowrap">

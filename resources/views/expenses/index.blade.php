@@ -15,17 +15,31 @@
 
             search: '',
             filterType: '',
-            dateFrom: '',
-            dateTo: '',
+            dateRange: '',
 
             showNoResults: false,
 
-            // Watch for filter changes and update no results message
             init() {
-                this.$watch(() => [this.search, this.filterType, this.dateFrom, this.dateTo], () => {
-                    this.$nextTick(() => {
-                        this.updateNoResults();
-                    });
+                // Initialize Flatpickr inside Alpine
+                this.initFlatpickr();
+
+                this.$watch(() => [this.search, this.filterType, this.dateRange], () => {
+                    this.$nextTick(() => this.updateNoResults());
+                });
+            },
+
+            initFlatpickr() {
+                const picker = this.$refs.datePicker;
+
+                flatpickr(picker, {
+                    mode: 'range',
+                    dateFormat: 'Y-m-d',
+                    altInput: true,
+                    altFormat: 'M d, Y',
+                    allowInput: true,
+                    onChange: (selectedDates, dateStr) => {
+                        this.dateRange = dateStr;   // Direct binding to Alpine data
+                    }
                 });
             },
 
@@ -44,9 +58,29 @@
             clearAllFilters() {
                 this.search = '';
                 this.filterType = '';
-                this.dateFrom = '';
-                this.dateTo = '';
-            }
+                this.dateRange = '';
+
+               const fp = this.$refs.datePicker._flatpickr;
+                if (fp) fp.clear();
+            },
+
+            isDateInRange(expenseDate) {
+                if (!this.dateRange) return true;
+
+                const dates = this.dateRange.split(' to ');
+                const expense = new Date(expenseDate);
+
+                if (dates.length === 1) {
+                    // Single date
+                    return expense.toISOString().split('T')[0] === dates[0];
+                } else if (dates.length === 2) {
+                    // Date range
+                    const from = new Date(dates[0]);
+                    const to = new Date(dates[1]);
+                    return expense >= from && expense <= to;
+                }
+                return true;
+            },
          }"
     >
 
@@ -103,9 +137,7 @@
                                 class="expense-card group relative bg-white border border-gray-200 hover:border-blue-200 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
                                 x-show="
                                     (search === '' || '{{ strtolower(addslashes($expense->expense_name)) }}'.includes(search.toLowerCase())) &&
-                                    (filterType === '' || '{{ $expense->type }}' === filterType) &&
-                                    (!dateFrom || '{{ $expense->created_at->format('Y-m-d') }}' >= dateFrom) &&
-                                    (!dateTo || '{{ $expense->created_at->format('Y-m-d') }}' <= dateTo)
+                                    (filterType === '' || '{{ $expense->type }}' === filterType) && isDateInRange('{{ $expense->created_at->format('Y-m-d') }}')
                                 "
                                 x-transition>
 
