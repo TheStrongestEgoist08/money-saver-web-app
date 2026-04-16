@@ -1,3 +1,5 @@
+
+{{-- Report Page --}}
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-2xl md:text-3xl text-gray-800 tracking-tight">Expense Reports</h2>
@@ -11,26 +13,14 @@
                 <!-- Populated by JS -->
             </div>
 
-            {{-- Mobile-Friendly One-Row Filters --}}
+            {{-- Mobile-Friendly Filters --}}
             <div class="bg-white shadow-xl rounded-3xl overflow-hidden border border-gray-100">
                 <div class="px-5 md:px-8 py-6 bg-gray-50 border-b">
-                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 items-end">
-
-                        <!-- Search -->
-                        <div>
-                            <div class="relative">
-                                <input
-                                    type="text"
-                                    id="searchInput"
-                                    placeholder="Search expense..."
-                                    class="w-full pl-11 pr-4 py-4 md:py-3.5 bg-white border border-gray-200 rounded-2xl focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 outline-none transition-all text-base">
-                                <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">🔍</div>
-                            </div>
-                        </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
 
                         <!-- Category -->
                         <div>
-                            <select id="typeSelect" class="w-full px-5 py-4 md:py-3.5 bg-white border border-gray-200 rounded-2xl focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 outline-none transition-all text-base">
+                            <select id="typeSelect" class="w-full px-5 py-4 md:py-3.5 bg-white border border-gray-200 rounded-2xl focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none transition-all text-base">
                                 <option value="">All Categories</option>
                                 <option value="Food">🍔 Food</option>
                                 <option value="Groceries">🛒 Groceries</option>
@@ -57,7 +47,7 @@
                                 type="text"
                                 id="dateRange"
                                 placeholder="Date range"
-                                class="w-full px-5 py-4 md:py-3.5 bg-white border border-gray-200 rounded-2xl focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 outline-none transition-all text-base">
+                                class="w-full px-5 py-4 md:py-3.5 bg-white border border-gray-200 rounded-2xl focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none transition-all text-base">
                         </div>
 
                         <!-- Buttons -->
@@ -67,7 +57,7 @@
                                 Clear
                             </button>
                             <button onclick="loadReports()"
-                                    class="flex-1 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-semibold py-4 md:py-3.5 rounded-2xl transition-all shadow-md">
+                                    class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold py-4 md:py-3.5 rounded-2xl transition-all shadow-md">
                                 Apply
                             </button>
                         </div>
@@ -76,11 +66,19 @@
                 </div>
             </div>
 
-            {{-- Chart --}}
+            {{-- Bar Chart --}}
             <div class="bg-white shadow-xl rounded-3xl p-5 md:p-8 border border-gray-100">
                 <h3 class="text-lg md:text-xl font-semibold text-gray-800 mb-4 md:mb-6">Expenses by Category</h3>
                 <div class="h-[320px] md:h-[400px]">
                     <canvas id="expenseBarChart"></canvas>
+                </div>
+            </div>
+
+            {{-- Line Chart --}}
+            <div class="bg-white shadow-xl rounded-3xl p-5 md:p-8 border border-gray-100">
+                <h3 class="text-lg md:text-xl font-semibold text-gray-800 mb-4 md:mb-6">Daily Spending Trend</h3>
+                <div class="h-[320px] md:h-[400px]">
+                    <canvas id="expenseLineChart"></canvas>
                 </div>
             </div>
 
@@ -118,7 +116,8 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <script>
-    let expenseChart;
+    let expenseChart;   // Bar Chart
+    let lineChart;      // Line Chart
     let datePicker;
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -131,7 +130,6 @@
     });
 
     function clearAllFilters() {
-        document.getElementById('searchInput').value = '';
         document.getElementById('typeSelect').value = '';
         if (datePicker) datePicker.clear();
         loadReports();
@@ -140,11 +138,9 @@
     function loadReports() {
         const formData = new FormData();
 
-        const search = document.getElementById('searchInput').value.trim();
         const type = document.getElementById('typeSelect').value;
         const dateRange = document.getElementById('dateRange').value;
 
-        if (search) formData.append('search', search);
         if (type) formData.append('type', type);
         if (dateRange) {
             const dates = dateRange.split(' to ');
@@ -154,7 +150,7 @@
 
         document.getElementById('tableBody').innerHTML = `
             <tr><td colspan="5" class="text-center py-16">
-                <div class="animate-spin w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full mx-auto"></div>
+                <div class="animate-spin w-8 h-8 border-4 border-emerald-200 border-t-emerald-600 rounded-full mx-auto"></div>
             </td></tr>`;
 
         fetch("{{ route('user.reports.filter') }}", {
@@ -170,6 +166,7 @@
             updateSummaryCards(data.expenses);
             updateTable(data.expenses);
             updateHorizontalBarChart(data.summary);
+            updateLineChart(data.daily || []);
         })
         .catch(err => {
             console.error(err);
@@ -183,17 +180,22 @@
         const avg = count ? total / count : 0;
 
         document.getElementById('summaryCards').innerHTML = `
-            <div class="bg-white shadow-xl rounded-3xl p-5 md:p-6 text-center">
+            <div class="bg-white shadow-xl rounded-3xl p-6 text-center">
+                <p class="text-4xl mb-2">💰</p>
                 <p class="text-gray-500 text-sm">Total Spent</p>
-                <p class="text-3xl md:text-4xl font-bold text-gray-900 mt-1">₱${total.toLocaleString('en-PH', {minimumFractionDigits: 2})}</p>
+                <p class="text-3xl md:text-4xl font-bold text-red-600 mt-1">₱${total.toLocaleString('en-PH', {minimumFractionDigits: 2})}</p>
             </div>
-            <div class="bg-white shadow-xl rounded-3xl p-5 md:p-6 text-center">
+
+            <div class="bg-white shadow-xl rounded-3xl p-6 text-center">
+                <p class="text-4xl mb-2">📋</p>
                 <p class="text-gray-500 text-sm">Transactions</p>
                 <p class="text-3xl md:text-4xl font-bold text-gray-900 mt-1">${count}</p>
             </div>
-            <div class="bg-white shadow-xl rounded-3xl p-5 md:p-6 text-center">
+
+            <div class="bg-white shadow-xl rounded-3xl p-6 text-center">
+                <p class="text-4xl mb-2">📊</p>
                 <p class="text-gray-500 text-sm">Average</p>
-                <p class="text-3xl md:text-4xl font-bold text-gray-900 mt-1">₱${avg.toLocaleString('en-PH', {minimumFractionDigits: 2})}</p>
+                <p class="text-3xl md:text-4xl font-bold text-red-600 mt-1">₱${avg.toLocaleString('en-PH', {minimumFractionDigits: 2})}</p>
             </div>
         `;
     }
@@ -217,7 +219,7 @@
                     </td>
                     <td class="px-5 md:px-8 py-4 font-medium">${exp.expense_name}</td>
                     <td class="px-5 md:px-8 py-4 text-gray-600 hidden sm:table-cell">${exp.description ? exp.description.substring(0, 50) + '...' : '-'}</td>
-                    <td class="px-5 md:px-8 py-4 text-right font-semibold">₱${parseFloat(exp.total).toLocaleString('en-PH', {minimumFractionDigits: 2})}</td>
+                    <td class="px-5 md:px-8 py-4 text-right font-semibold text-emerald-600">₱${parseFloat(exp.total).toLocaleString('en-PH', {minimumFractionDigits: 2})}</td>
                 </tr>`;
             tbody.innerHTML += row;
         });
@@ -234,8 +236,8 @@
                 datasets: [{
                     label: 'Total Amount Spent',
                     data: summary.map(s => parseFloat(s.total_amount)),
-                    backgroundColor: '#6366f1',
-                    borderColor: '#4f46e5',
+                    backgroundColor: '#10b981',
+                    borderColor: '#059669',
                     borderWidth: 2,
                     borderRadius: 12,
                     barThickness: 35,
@@ -246,14 +248,51 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        display: false,
-                        position: 'bottom',
-                        labels: { boxWidth: 14, padding: 15, font: { size: 13 } }
-                    }
+                    legend: { display: false }
                 },
                 scales: {
                     x: { beginAtZero: true }
+                }
+            }
+        });
+    }
+
+    function updateLineChart(dailyData) {
+        const ctx = document.getElementById('expenseLineChart');
+        if (lineChart) lineChart.destroy();
+
+        lineChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dailyData.map(item => item.date),
+                datasets: [{
+                    label: 'Daily Spending',
+                    data: dailyData.map(item => parseFloat(item.total)),
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.3,
+                    pointBackgroundColor: '#10b981',
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                },
+                scales: {
+                    x: { grid: { color: '#f3f4f6' } },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#f3f4f6' }
+                    }
                 }
             }
         });

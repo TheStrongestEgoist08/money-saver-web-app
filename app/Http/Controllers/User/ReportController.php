@@ -14,39 +14,47 @@ class ReportController extends Controller
         return view('reports.index');
     }
 
-public function filter(Request $request)
-{
-    $baseQuery = Expense::where('user_id', Auth::id());
+    public function filter(Request $request)
+    {
+        $query = Expense::where('user_id', Auth::id());
 
-    // Apply Filters
-    if ($request->filled('date_from')) {
-        $baseQuery->whereDate('created_at', '>=', $request->date_from);
+        // === Date Filter ===
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        // === Category/Type Filter ===
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        // === Main Table Data ===
+        $expenses = $query->clone()
+            ->select('id', 'expense_name', 'type', 'total', 'description', 'created_at')
+            ->latest('created_at')
+            ->get();
+
+        // === Bar Chart Summary (by Category) ===
+        $summary = $query->clone()
+            ->selectRaw('type, SUM(total) as total_amount, COUNT(*) as count')
+            ->groupBy('type')
+            ->orderByDesc('total_amount')
+            ->get();
+
+        // === Line Chart Data (Daily Spending Trend) ===
+        $daily = $query->clone()
+            ->selectRaw('DATE(created_at) as date, SUM(total) as total')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        return response()->json([
+            'expenses' => $expenses,
+            'summary'  => $summary,
+            'daily'    => $daily,
+        ]);
     }
-    if ($request->filled('date_to')) {
-        $baseQuery->whereDate('created_at', '<=', $request->date_to);
-    }
-
-    if ($request->filled('types')) {
-        $types = is_array($request->types) ? $request->types : [$request->types];
-        $baseQuery->whereIn('type', $types);
-    }
-
-    // Table Data
-    $expenses = $baseQuery->clone()
-                          ->select('id', 'expense_name', 'type', 'total', 'description', 'created_at')
-                          ->latest('created_at')
-                          ->get();
-
-    // Chart Summary (Separate Query - This fixes the GROUP BY error)
-    $summary = $baseQuery->clone()
-                         ->selectRaw('type, SUM(total) as total_amount, COUNT(*) as count')
-                         ->groupBy('type')
-                         ->orderByDesc('total_amount')
-                         ->get();
-
-    return response()->json([
-        'expenses' => $expenses,
-        'summary'  => $summary,
-    ]);
-}
 }
