@@ -2,7 +2,17 @@
 {{-- Report Page --}}
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-2xl md:text-3xl text-gray-800 tracking-tight">Expense Reports</h2>
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-2xl md:text-3xl text-gray-800 tracking-tight">Expense Reports</h2>
+
+            <button onclick="exportToPDF()"
+                    class="flex items-center gap-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-semibold px-6 py-3 rounded-2xl transition-all shadow-md">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H3a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2z" />
+                </svg>
+                Export PDF Report
+            </button>
+        </div>
     </x-slot>
 
     <div class="py-6 md:py-8">
@@ -111,13 +121,11 @@
     </div>
 </x-app-layout>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script>
-    let expenseChart;   // Bar Chart
-    let lineChart;      // Line Chart
+    let expenseChart;
+    let lineChart;
     let datePicker;
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -296,5 +304,67 @@
                 }
             }
         });
+    }
+
+    async function exportToPDF() {
+        const btn = event.currentTarget;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = 'Generating PDF...';
+        btn.disabled = true;
+
+        try {
+            // Use global html2canvas (we'll expose it)
+            if (typeof html2canvas === 'undefined') {
+                alert("html2canvas is not loaded. Please refresh the page.");
+                return;
+            }
+
+            const options = {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#ffffff',
+                width: 1250,
+                height: 520,
+                logging: false,
+            };
+
+            const barCanvas = await html2canvas(document.getElementById('expenseBarChart'), options);
+            const lineCanvas = await html2canvas(document.getElementById('expenseLineChart'), options);
+
+            const barImage = barCanvas.toDataURL('image/png', 0.92);
+            const lineImage = lineCanvas.toDataURL('image/png', 0.92);
+
+            const formData = new FormData();
+            formData.append('type', document.getElementById('typeSelect').value || '');
+            formData.append('date_range', document.getElementById('dateRange').value || '');
+            formData.append('bar_chart', barImage);
+            formData.append('line_chart', lineImage);
+
+            const response = await fetch("{{ route('user.reports.export-pdf') }}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                }
+            });
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Formal_Expense_Report_${new Date().toISOString().slice(0,10)}.pdf`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+            } else {
+                alert('Failed to generate PDF');
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Error generating PDF. Please check console.');
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
     }
 </script>

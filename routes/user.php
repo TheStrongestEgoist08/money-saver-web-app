@@ -56,4 +56,7 @@ Route::controller(ReportController::class)->middleware(['auth', 'verified'])->pr
 
     Route::post('/reports/filter', 'filter')
         ->name('user.reports.filter');
+
+    Route::post('/reports/export-pdf', 'exportPDF')
+        ->name('user.reports.export-pdf');
 });

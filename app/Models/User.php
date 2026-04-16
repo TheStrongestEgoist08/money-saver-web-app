@@ -30,7 +30,7 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    public function user() {
+    public function expenses() {
         return $this->hasMany(Expense::class);
     }
 }
