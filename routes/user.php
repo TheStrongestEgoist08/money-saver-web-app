@@ -53,4 +53,7 @@ Route::controller(GoalsController::class)->middleware(['auth', 'verified'])->pre
 Route::controller(ReportController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
     Route::get('/reports', 'index')
         ->name('user.reports');
+
+    Route::post('/reports/filter', 'filter')
+        ->name('user.reports.filter');
 });
