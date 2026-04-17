@@ -2,84 +2,154 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Formal Expense Report</title>
+    <title>Expense Report</title>
     <style>
         body {
             font-family: 'DejaVu Sans', Arial, sans-serif;
-            font-size: 12px;
-            margin: 30px;
-            color: #1f2937;
-            line-height: 1.6;
+            font-size: 11px;
+            margin: 25px;
+            color: #111827;
+            line-height: 1.5;
         }
-        h1 { text-align: center; color: #111827; margin-bottom: 8px; }
-        .subtitle { text-align: center; color: #6b7280; margin-bottom: 35px; }
 
-        /* Summary - 1 Row, 3 Columns using Table */
+        h1 {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 3px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 10px;
+            color: #6b7280;
+            margin-bottom: 15px;
+        }
+
+        .header {
+            border-bottom: 2px solid #10b981;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        /* SUMMARY */
         .summary-table {
             width: 100%;
-            margin: 30px 0;
-            border-collapse: separate;
-            border-spacing: 12px;
+            border-collapse: collapse;
+            margin-bottom: 15px;
         }
+
+        .summary-table td {
+            border: none;
+            padding: 0 5px;
+        }
+
         .summary-box {
-            border: 2px solid #e5e7eb;
-            padding: 20px 15px;
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 10px;
+            height: 70px;
             text-align: center;
-            border-radius: 12px;
-            background-color: #f9fafb;
         }
+
         .summary-box h3 {
-            margin: 0 0 8px 0;
-            color: #374151;
-            font-size: 13px;
-        }
-        .summary-box h2 {
             margin: 0;
-            font-size: 24px;
+            font-size: 10px;
+            color: #6b7280;
+            text-transform: uppercase;
+        }
+
+        .summary-box h2 {
+            margin-top: 5px;
+            font-size: 16px;
             color: #10b981;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 25px 0;
+        /* SECTION */
+        .section-title {
+            font-size: 12px;
+            margin-top: 15px;
+            margin-bottom: 6px;
+            font-weight: bold;
+            border-left: 3px solid #10b981;
+            padding-left: 6px;
         }
-        th, td {
-            border: 1px solid #d1d5db;
-            padding: 12px;
-            text-align: left;
-        }
-        th {
-            background-color: #f3f4f6;
-            font-weight: 600;
-        }
-        .text-right { text-align: right; }
 
+        /* CHART FIX */
         .chart-container {
             text-align: center;
-            margin: 40px 0;
+            margin: 10px 0 15px 0;
             page-break-inside: avoid;
         }
-        img {
-            max-width: 100%;
-            height: auto;
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
+
+        .chart-box {
+            display: inline-block;
+            width: 100%;
+            max-width: 500px;
         }
-        .header {
-            border-bottom: 4px solid #10b981;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
+
+        .chart-box img {
+            width: 100%;
+            height: auto;
+            max-height: 220px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+        }
+
+        /* TABLE */
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+        }
+
+        th {
+            background-color: #f3f4f6;
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #374151;
+        }
+
+        th, td {
+            border: 1px solid #e5e7eb;
+            padding: 6px;
+        }
+
+        td {
+            font-size: 10px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        /* PREVENT BREAK ISSUES */
+        .no-break {
+            page-break-inside: avoid;
+        }
+
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 9px;
+            color: #9ca3af;
         }
     </style>
 </head>
 <body>
+
     <div class="header">
-        <h1>FORMAL EXPENSE REPORT</h1>
-        <p class="subtitle">Generated on: {{ now()->format('F d, Y \a\t h:i A') }}</p>
+        <h1>EXPENSE REPORT</h1>
+        <p class="subtitle">
+            Generated on {{ now()->format('F d, Y \a\t h:i A') }}
+        </p>
     </div>
 
-    <!-- Summary - Now 1 Row, 3 Columns -->
+    <!-- SUMMARY -->
     <table class="summary-table">
         <tr>
             <td width="33%">
@@ -90,61 +160,70 @@
             </td>
             <td width="33%">
                 <div class="summary-box">
-                    <h3>Total Transactions</h3>
+                    <h3>Transactions</h3>
                     <h2>{{ $transactionCount }}</h2>
                 </div>
             </td>
             <td width="33%">
                 <div class="summary-box">
-                    <h3>Average per Transaction</h3>
+                    <h3>Average</h3>
                     <h2>₱{{ number_format($average, 2) }}</h2>
                 </div>
             </td>
         </tr>
     </table>
 
-    <!-- Charts -->
-    <div class="chart-container">
-        <h2>Expenses by Category</h2>
-        @if($barChartImage)
-            <img src="{{ $barChartImage }}" alt="Expenses by Category">
-        @endif
+    <!-- CHARTS -->
+    <div class="no-break">
+        <div class="section-title">Expenses by Category</div>
+        <div class="chart-container">
+            <div class="chart-box">
+                @if($barChartImage)
+                    <img src="{{ $barChartImage }}">
+                @endif
+            </div>
+        </div>
     </div>
 
-    <div class="chart-container">
-        <h2>Daily Spending Trend</h2>
-        @if($lineChartImage)
-            <img src="{{ $lineChartImage }}" alt="Daily Spending Trend">
-        @endif
+    <div class="no-break">
+        <div class="section-title">Daily Spending Trend</div>
+        <div class="chart-container">
+            <div class="chart-box">
+                @if($lineChartImage)
+                    <img src="{{ $lineChartImage }}">
+                @endif
+            </div>
+        </div>
     </div>
 
-    <!-- Detailed Table -->
-    <h2>Detailed Expense Transactions</h2>
-    <table>
+    <!-- TABLE -->
+    <div class="section-title">Detailed Transactions</div>
+    <table class="data-table">
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Category</th>
-                <th>Expense Name</th>
-                <th>Description</th>
-                <th class="text-right">Amount (₱)</th>
+                <th width="15%">Date</th>
+                <th width="15%">Category</th>
+                <th width="20%">Name</th>
+                <th width="30%">Description</th>
+                <th width="20%" class="text-right">Amount (₱)</th>
             </tr>
         </thead>
         <tbody>
             @foreach($expenses as $exp)
             <tr>
                 <td>{{ $exp->created_at->format('M d, Y') }}</td>
-                <td>{{ $exp->type }}</td>
+                <td>{{ ucfirst($exp->type) }}</td>
                 <td>{{ $exp->expense_name }}</td>
-                <td>{{ Str::limit($exp->description ?? '-', 80) }}</td>
+                <td>{{ Str::limit($exp->description ?? '-', 50) }}</td>
                 <td class="text-right">{{ number_format($exp->total, 2) }}</td>
             </tr>
             @endforeach
         </tbody>
     </table>
 
-    <p style="text-align:center; margin-top:50px; color:#9ca3af; font-size:11px;">
-        This is a computer-generated formal report.
-    </p>
+    <div class="footer">
+        This report is system-generated.
+    </div>
+
 </body>
 </html>
