@@ -14,22 +14,12 @@ class SuggestionController extends Controller
         return view('suggestions.index');
     }
 
-    public function aiSuggestions()
+    public function aiSuggestions(AISuggestionService $service)
     {
-        try {
-            $suggestions = app(AISuggestionService::class)->getSuggestions('month');
+        $period = request('period', 'month');
 
-            return response()->json([
-                'success'     => true,
-                'suggestions' => $suggestions,
-                'period'      => 'This Month'
-            ]);
+        $result = $service->getSuggestions($period);
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to get AI suggestions. Please try again later.'
-            ], 500);
-        }
+        return response()->json($result);
     }
 }

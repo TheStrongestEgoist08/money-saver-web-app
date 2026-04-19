@@ -67,6 +67,6 @@ Route::controller(SuggestionController::class)->middleware(['auth', 'verified'])
     Route::get('/suggestions', 'index')
         ->name('user.suggestions');
 
-    Route::get('/suggestions', 'aiSuggestions')
+    Route::get('/suggestions/ai', 'aiSuggestions')
         ->name('user.suggestions.ai');
 });

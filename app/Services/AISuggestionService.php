@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Expense;
 use Illuminate\Support\Facades\Auth;
-use Prism\Prism\Facades\Prism;   // ← This is the important import
+use Prism\Prism\Facades\Prism;
 
 class AISuggestionService
 {
@@ -28,7 +28,11 @@ class AISuggestionService
         $expenses = $query->whereBetween('created_at', [$start, $end])->get();
 
         if ($expenses->isEmpty()) {
-            return "You haven't added any expenses yet. Start tracking to get AI suggestions! 💡";
+            return [
+                'success'     => true,
+                'period'      => ucfirst($period),
+                'suggestions' => "You haven't added any expenses yet. Start tracking to get AI suggestions! 💡"
+            ];
         }
 
         $totalSpent = $expenses->sum('total') ?? 0;
@@ -58,15 +62,25 @@ class AISuggestionService
 
         try {
             $response = Prism::text()
-                ->using('gemini', 'gemini-2.5-flash')
+                ->using('gemini', 'gemini-2.5-flash')   // or gemini-1.5-flash / gemini-2.0-flash etc.
                 ->withPrompt($prompt)
                 ->withMaxTokens(900)
                 ->generate();
 
-            return $response->text;
+            return [
+                'success'     => true,
+                'period'      => ucfirst($period),
+                'suggestions' => $response->text ?? 'No response from AI.',
+            ];
 
         } catch (\Exception $e) {
-            return "AI service is temporarily unavailable. Please try again later.";
+            \Log::error('AI Suggestion Error: ' . $e->getMessage());
+
+            return [
+                'success'     => false,
+                'message'     => 'AI service is temporarily unavailable. Please try again later.',
+                'error'       => config('app.debug') ? $e->getMessage() : null,
+            ];
         }
     }
 }
