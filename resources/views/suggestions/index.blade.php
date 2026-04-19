@@ -37,63 +37,64 @@
 
     @push('scripts')
     <script>
-    $(document).ready(function() {
+    document.addEventListener('DOMContentLoaded', function() {
 
-        $('#ai-btn').on('click', function() {
-            getAISuggestions();
-        });
+        const aiBtn = document.getElementById('ai-btn');
+        const loading = document.getElementById('ai-loading');
+        const result = document.getElementById('ai-result');
 
-        function getAISuggestions() {
-            const btn = $('#ai-btn');
-            const loading = $('#ai-loading');
-            const result = $('#ai-result');
+        aiBtn.addEventListener('click', getAISuggestions);
 
-            btn.prop('disabled', true)
-               .html('<i class="fas fa-spinner fa-spin"></i> Analyzing...');
+        async function getAISuggestions() {
+            // Disable button and show loading
+            aiBtn.disabled = true;
+            aiBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+            loading.classList.remove('d-none');
+            result.innerHTML = '';
 
-            loading.removeClass('d-none');
-            result.html('');
-
-            $.ajax({
-                url: "{{ route('expenses.ai-suggestions') }}",
-                type: "GET",
-                dataType: "json",
-                success: function(response) {
-                    if (response.success) {
-                        let html = `
-                            <div class="card border-0 shadow-sm">
-                                <div class="card-header bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
-                                    <strong>AI Suggestions • ${response.period}</strong>
-                                </div>
-                                <div class="card-body p-5 leading-relaxed text-gray-700 dark:text-gray-300">
-                                    ${response.suggestions.replace(/\n/g, '<br><br>')}
-                                </div>
-                            </div>
-                        `;
-                        result.html(html);
-                    } else {
-                        result.html(`
-                            <div class="alert alert-danger">
-                                ${response.message || 'Something went wrong.'}
-                            </div>
-                        `);
+            try {
+                const response = await fetch("{{ route('user.suggestions.ai') }}", {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
                     }
-                },
-                error: function() {
-                    result.html(`
-                        <div class="alert alert-danger">
-                            Failed to connect. Please check your internet and try again.
-                        </div>
-                    `);
-                },
-                complete: function() {
-                    btn.prop('disabled', false)
-                       .html('<i class="fas fa-magic"></i> Get AI Suggestions');
-                    loading.addClass('d-none');
-                }
-            });
-        }
+                });
 
+                const data = await response.json();
+
+                if (data.success) {
+                    result.innerHTML = `
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+                                <strong>AI Suggestions • ${data.period}</strong>
+                            </div>
+                            <div class="card-body p-5 leading-relaxed text-gray-700 dark:text-gray-300">
+                                ${data.suggestions.replace(/\n/g, '<br><br>')}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="alert alert-danger">
+                            ${data.message || 'Something went wrong.'}
+                        </div>
+                    `;
+                }
+
+            } catch (error) {
+                result.innerHTML = `
+                    <div class="alert alert-danger">
+                        Failed to connect. Please check your internet and try again.
+                    </div>
+                `;
+            } finally {
+                // Reset button
+                aiBtn.disabled = false;
+                aiBtn.innerHTML = '<i class="fas fa-magic"></i> Get AI Suggestions';
+                loading.classList.add('d-none');
+            }
+        }
     });
     </script>
     @endpush
