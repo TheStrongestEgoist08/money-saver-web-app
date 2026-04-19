@@ -6,6 +6,7 @@ use App\Http\Controllers\User\ExpenseController;
 use App\Http\Controllers\User\BalanceController;
 use App\Http\Controllers\User\GoalsController;
 use App\Http\Controllers\User\ReportController;
+use App\Http\Controllers\User\SuggestionController;
 
 # profile routes
 Route::controller(ProfileController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
@@ -59,4 +60,13 @@ Route::controller(ReportController::class)->middleware(['auth', 'verified'])->pr
 
     Route::post('/reports/export-pdf', 'exportPDF')
         ->name('user.reports.export-pdf');
+});
+
+# Suggestion route
+Route::controller(SuggestionController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
+    Route::get('/suggestions', 'index')
+        ->name('user.suggestions');
+
+    Route::get('/suggestions', 'aiSuggestions')
+        ->name('user.suggestions.ai');
 });
