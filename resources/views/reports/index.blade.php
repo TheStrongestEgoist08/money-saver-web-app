@@ -191,7 +191,7 @@
             <div class="bg-white shadow-xl rounded-3xl p-6 text-center">
                 <p class="text-4xl mb-2">💰</p>
                 <p class="text-gray-500 text-sm">Total Spent</p>
-                <p class="text-3xl md:text-4xl font-bold text-red-600 mt-1">₱${total.toLocaleString('en-PH', {minimumFractionDigits: 2})}</p>
+                <p class="text-3xl md:text-4xl font-bold text-red-600 mt-1">₱${total.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
             </div>
 
             <div class="bg-white shadow-xl rounded-3xl p-6 text-center">
@@ -203,7 +203,7 @@
             <div class="bg-white shadow-xl rounded-3xl p-6 text-center">
                 <p class="text-4xl mb-2">📊</p>
                 <p class="text-gray-500 text-sm">Average</p>
-                <p class="text-3xl md:text-4xl font-bold text-red-600 mt-1">₱${avg.toLocaleString('en-PH', {minimumFractionDigits: 2})}</p>
+                <p class="text-3xl md:text-4xl font-bold text-red-600 mt-1">₱${avg.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
             </div>
         `;
     }
