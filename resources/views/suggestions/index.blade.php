@@ -19,22 +19,24 @@
                             Let AI analyze your expenses and give personalized advice
                         </p>
                     </div>
+
+                    <!-- Flashing Button -->
                     <button id="ai-btn"
-                            class="btn bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl flex items-center gap-3 font-medium transition-all duration-200 shadow-md hover:shadow-lg">
+                            class="btn bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl flex items-center gap-3 font-medium transition-all duration-200 shadow-md hover:shadow-lg animate-pulse">
                         <i class="fas fa-magic"></i>
                         Get AI Suggestions
                     </button>
                 </div>
 
-                <!-- Loading -->
-                <div id="ai-loading" class="d-none text-center py-16">
+                <!-- Loading Banner -->
+                <div id="ai-loading" class="d-none text-center py-16 bg-indigo-50 border-b border-indigo-100">
                     <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 rounded-2xl mb-6">
                         <div class="spinner-border text-indigo-600 w-8 h-8" role="status"></div>
                     </div>
-                    <p class="text-gray-600 font-medium">
+                    <p class="text-indigo-700 font-semibold text-lg">
                         AI is analyzing your expenses...
                     </p>
-                    <p class="text-gray-400 text-sm mt-1">This may take a few seconds</p>
+                    <p class="text-gray-500 text-sm mt-1">This may take a few seconds</p>
                 </div>
 
                 <!-- Result -->
@@ -58,9 +60,12 @@
             async function getAISuggestions() {
                 console.clear();
 
-                // Disable button & show loading
+                // Disable button and show "AI is analyzing"
                 aiBtn.disabled = true;
-                aiBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+                aiBtn.classList.remove('animate-pulse');
+                aiBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> AI is analyzing...`;
+
+                // Show loading
                 loading.classList.remove('d-none');
                 resultDiv.innerHTML = '';
 
@@ -68,19 +73,16 @@
                     const response = await fetch(aiUrl, {
                         method: 'GET',
                         credentials: 'same-origin',
-                        headers: {
-                            'Accept': 'application/json'
-                        }
+                        headers: { 'Accept': 'application/json' }
                     });
 
-                    if (!response.ok) {
-                        const text = await response.text();
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
                     const data = await response.json();
 
-                    if (data.success === true) {
+                    if (data.success === true && data.suggestions) {
+
+                        // Create the result container
                         resultDiv.innerHTML = `
                             <div class="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
                                 <div class="px-8 py-5 bg-gradient-to-r from-indigo-50 to-white border-b border-gray-100 flex items-center gap-3">
@@ -92,12 +94,37 @@
                                         <span class="text-gray-400 text-sm ml-2">• ${data.period || 'Current Period'}</span>
                                     </div>
                                 </div>
-                                <div class="p-8 leading-relaxed text-gray-700 prose prose-gray max-w-none">
-                                    ${data.suggestions ? data.suggestions.replace(/\n/g, '<br><br>') : 'No suggestions returned.'}
+                                <div class="p-8">
+                                    <div id="typed-text" class="leading-relaxed text-gray-700 text-[17px] min-h-[100px]">
+                                    </div>
                                 </div>
                             </div>
                         `;
+
+                        // Typing Animation
+                        const typedContainer = document.getElementById('typed-text');
+                        const fullText = data.suggestions;
+                        let index = 0;
+                        const speed = 10; // typing speed in ms (lower = faster)
+
+                        function typeWriter() {
+                            if (index < fullText.length) {
+                                // Handle new lines properly
+                                if (fullText.charAt(index) === '\n') {
+                                    typedContainer.innerHTML += '<br><br>';
+                                } else {
+                                    typedContainer.innerHTML += fullText.charAt(index);
+                                }
+                                index++;
+                                setTimeout(typeWriter, speed);
+                            }
+                        }
+
+                        // Start typing after a small delay
+                        setTimeout(typeWriter, 300);
+
                     } else {
+                        // No suggestions case
                         resultDiv.innerHTML = `
                             <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6">
                                 <div class="flex gap-3">
@@ -125,10 +152,12 @@
                         </div>
                     `;
                 } finally {
-                    // Reset button
+                    // Hide loading and reset button
+                    loading.classList.add('d-none');
+
                     aiBtn.disabled = false;
                     aiBtn.innerHTML = `<i class="fas fa-magic"></i> Get AI Suggestions`;
-                    loading.classList.add('d-none');
+                    aiBtn.classList.add('animate-pulse'); // restart flashing
                 }
             }
         });
