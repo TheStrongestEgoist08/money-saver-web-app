@@ -68,9 +68,9 @@
             try {
                 const response = await fetch(aiUrl, {
                     method: 'GET',
+                    credentials: 'same-origin',
                     headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
+                        'Accept': 'application/json'
                     }
                 });
 
