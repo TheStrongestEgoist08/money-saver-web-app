@@ -6,6 +6,8 @@ use App\Models\Expense;
 use Illuminate\Support\Facades\Auth;
 use Prism\Prism\Facades\Prism;
 
+use Illuminate\Support\Facades\Log;
+
 class AISuggestionService
 {
     public function getSuggestions(string $period = 'month')
@@ -61,11 +63,21 @@ class AISuggestionService
         $prompt .= "\nGive 5 practical, actionable suggestions to help this user save money.";
 
         try {
+            \Log::info('AI Suggestion: Starting request', [
+                'user_id' => $user->id,
+                'period' => $period,
+                'total_spent' => $totalSpent,
+            ]);
+
             $response = Prism::text()
                 ->using('gemini', 'gemini-2.5-flash')
                 ->withPrompt($prompt)
-                ->withMaxTokens(900)
+                ->withMaxTokens(4096)
                 ->generate();
+
+            \Log::info('AI Suggestion: Raw response received', [
+                'text_preview' => substr($response->text ?? '', 0, 500),
+            ]);
 
             # dd($response);
 

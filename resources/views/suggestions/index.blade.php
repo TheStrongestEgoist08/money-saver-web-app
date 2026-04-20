@@ -44,95 +44,93 @@
         </div>
     </div>
 
-    @push('scripts')
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {
 
-        const aiBtn = document.getElementById('ai-btn');
-        const loading = document.getElementById('ai-loading');
-        const resultDiv = document.getElementById('ai-result');
+            const aiBtn = document.getElementById('ai-btn');
+            const loading = document.getElementById('ai-loading');
+            const resultDiv = document.getElementById('ai-result');
 
-        const aiUrl = "{{ route('user.suggestions.ai') }}";
+            const aiUrl = "{{ route('user.suggestions.ai') }}";
 
-        aiBtn.addEventListener('click', getAISuggestions);
+            aiBtn.addEventListener('click', getAISuggestions);
 
-        async function getAISuggestions() {
-            console.clear();
+            async function getAISuggestions() {
+                console.clear();
 
-            // Disable button & show loading
-            aiBtn.disabled = true;
-            aiBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
-            loading.classList.remove('d-none');
-            resultDiv.innerHTML = '';
+                // Disable button & show loading
+                aiBtn.disabled = true;
+                aiBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+                loading.classList.remove('d-none');
+                resultDiv.innerHTML = '';
 
-            try {
-                const response = await fetch(aiUrl, {
-                    method: 'GET',
-                    credentials: 'same-origin',
-                    headers: {
-                        'Accept': 'application/json'
+                try {
+                    const response = await fetch(aiUrl, {
+                        method: 'GET',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const text = await response.text();
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                     }
-                });
 
-                if (!response.ok) {
-                    const text = await response.text();
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
+                    const data = await response.json();
 
-                const data = await response.json();
-
-                if (data.success === true) {
-                    resultDiv.innerHTML = `
-                        <div class="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
-                            <div class="px-8 py-5 bg-gradient-to-r from-indigo-50 to-white border-b border-gray-100 flex items-center gap-3">
-                                <div class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center">
-                                    <i class="fas fa-lightbulb"></i>
+                    if (data.success === true) {
+                        resultDiv.innerHTML = `
+                            <div class="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+                                <div class="px-8 py-5 bg-gradient-to-r from-indigo-50 to-white border-b border-gray-100 flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center">
+                                        <i class="fas fa-lightbulb"></i>
+                                    </div>
+                                    <div>
+                                        <strong class="text-gray-800">AI Suggestions</strong>
+                                        <span class="text-gray-400 text-sm ml-2">• ${data.period || 'Current Period'}</span>
+                                    </div>
                                 </div>
-                                <div>
-                                    <strong class="text-gray-800">AI Suggestions</strong>
-                                    <span class="text-gray-400 text-sm ml-2">• ${data.period || 'Current Period'}</span>
+                                <div class="p-8 leading-relaxed text-gray-700 prose prose-gray max-w-none">
+                                    ${data.suggestions ? data.suggestions.replace(/\n/g, '<br><br>') : 'No suggestions returned.'}
                                 </div>
                             </div>
-                            <div class="p-8 leading-relaxed text-gray-700 prose prose-gray max-w-none">
-                                ${data.suggestions ? data.suggestions.replace(/\n/g, '<br><br>') : 'No suggestions returned.'}
+                        `;
+                    } else {
+                        resultDiv.innerHTML = `
+                            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6">
+                                <div class="flex gap-3">
+                                    <i class="fas fa-exclamation-triangle text-amber-500 text-xl mt-0.5"></i>
+                                    <div>
+                                        <strong class="text-amber-700">No suggestions available</strong>
+                                        <p class="text-amber-600 mt-1">${data.message || 'Please try again later.'}</p>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    `;
-                } else {
+                        `;
+                    }
+
+                } catch (error) {
+                    console.error('Error:', error);
                     resultDiv.innerHTML = `
-                        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6">
+                        <div class="bg-red-50 border border-red-200 rounded-2xl p-6">
                             <div class="flex gap-3">
-                                <i class="fas fa-exclamation-triangle text-amber-500 text-xl mt-0.5"></i>
+                                <i class="fas fa-circle-xmark text-red-500 text-xl mt-0.5"></i>
                                 <div>
-                                    <strong class="text-amber-700">No suggestions available</strong>
-                                    <p class="text-amber-600 mt-1">${data.message || 'Please try again later.'}</p>
+                                    <strong class="text-red-700">Request Failed</strong>
+                                    <p class="text-red-600 mt-1">${error.message}</p>
                                 </div>
                             </div>
                         </div>
                     `;
+                } finally {
+                    // Reset button
+                    aiBtn.disabled = false;
+                    aiBtn.innerHTML = `<i class="fas fa-magic"></i> Get AI Suggestions`;
+                    loading.classList.add('d-none');
                 }
-
-            } catch (error) {
-                console.error('Error:', error);
-                resultDiv.innerHTML = `
-                    <div class="bg-red-50 border border-red-200 rounded-2xl p-6">
-                        <div class="flex gap-3">
-                            <i class="fas fa-circle-xmark text-red-500 text-xl mt-0.5"></i>
-                            <div>
-                                <strong class="text-red-700">Request Failed</strong>
-                                <p class="text-red-600 mt-1">${error.message}</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } finally {
-                // Reset button
-                aiBtn.disabled = false;
-                aiBtn.innerHTML = `<i class="fas fa-magic"></i> Get AI Suggestions`;
-                loading.classList.add('d-none');
             }
-        }
-    });
+        });
     </script>
-    @endpush
 </x-app-layout>
