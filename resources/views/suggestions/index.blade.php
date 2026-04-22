@@ -105,7 +105,9 @@
                         const typedContainer = document.getElementById('typed-text');
                         const fullText = data.suggestions;
                         let index = 0;
-                        const speed = 10; // typing speed in ms (lower = faster)
+                        
+                        // typing speed in ms (lower = faster)
+                        const speed = 1;
 
                         function typeWriter() {
                             if (index < fullText.length) {
