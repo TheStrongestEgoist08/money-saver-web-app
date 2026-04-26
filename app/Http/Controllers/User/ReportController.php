@@ -108,7 +108,7 @@ class ReportController extends Controller
         $barChartImage = $request->get('bar_chart');
         $lineChartImage = $request->get('line_chart');
 
-        $pdf = Pdf::loadView('reports.pdf', compact(
+        $pdf = Pdf::loadView('reports.partials.pdf', compact(
             'expenses',
             'totalSpent',
             'transactionCount',
@@ -123,7 +123,7 @@ class ReportController extends Controller
         $pdf->setOption('isHtml5ParserEnabled', true);
         $pdf->setOption('isRemoteEnabled', true);
 
-        $filename = 'Formal_Expense_Report_' . now()->format('Y-m-d_His') . '.pdf';
+        $filename = 'Formal_Expense_Report_' . now()->format('Y-m-d_His') . '_' . uniqid() . '.pdf';
 
         return $pdf->download($filename);
     }

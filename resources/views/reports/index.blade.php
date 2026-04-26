@@ -353,7 +353,7 @@
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `Formal_Expense_Report_${new Date().toISOString().slice(0,10)}.pdf`;
+                a.download = `Formal_Expense_Report_${new Date().toISOString().replace(/[:.]/g, '-')}.pdf`;
                 a.click();
                 window.URL.revokeObjectURL(url);
             } else {
