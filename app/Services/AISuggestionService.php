@@ -63,7 +63,7 @@ class AISuggestionService
         $prompt .= "\nGive 5 practical, actionable suggestions to help this user save money.";
 
         try {
-            \Log::info('AI Suggestion: Starting request', [
+            Log::info('AI Suggestion: Starting request', [
                 'user_id' => $user->id,
                 'period' => $period,
                 'total_spent' => $totalSpent,
@@ -75,7 +75,7 @@ class AISuggestionService
                 ->withMaxTokens(4096)
                 ->generate();
 
-            \Log::info('AI Suggestion: Raw response received', [
+            Log::info('AI Suggestion: Raw response received', [
                 'text_preview' => substr($response->text ?? '', 0, 500),
             ]);
 
@@ -88,7 +88,7 @@ class AISuggestionService
             ];
 
         } catch (\Exception $e) {
-            \Log::error('AI Suggestion Error: ' . $e->getMessage());
+            Log::error('AI Suggestion Error: ' . $e->getMessage());
 
             return [
                 'success'     => false,
