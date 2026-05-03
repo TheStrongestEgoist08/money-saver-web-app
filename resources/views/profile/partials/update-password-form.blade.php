@@ -22,7 +22,6 @@
                 type="password"
                 class="mt-2 block w-full rounded-2xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 py-3.5 px-5 text-[15px] sm:text-[15.5px] transition-all duration-200"
                 autocomplete="current-password"
-                required
             />
             <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
         </div>
@@ -38,7 +37,6 @@
                 pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,25}"
                 title="8-25 characters with uppercase, lowercase, number & special char."
                 onkeyup="checkPasswordMatch()"
-                required
             />
             <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
         </div>
@@ -52,14 +50,16 @@
                 class="mt-2 block w-full rounded-2xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 py-3.5 px-5 text-[15px] sm:text-[15.5px] transition-all duration-200"
                 autocomplete="new-password"
                 onkeyup="checkPasswordMatch()"
-                required
             />
             <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
             <p id="password-match-message" class="mt-1 text-sm hidden"></p>
         </div>
 
         <div class="flex items-center gap-4 pt-4">
-            <x-primary-button class="px-8 py-3.5 sm:px-10 sm:py-4 bg-gray-900 hover:bg-gray-950 active:bg-black text-white font-semibold rounded-2xl text-base transition-all duration-200" id="submit-btn">
+            <x-primary-button
+                id="submit-btn"
+                class="px-8 py-3.5 sm:px-10 sm:py-4 text-white font-semibold rounded-2xl text-base transition-all duration-200 disabled:cursor-not-allowed"
+            >
                 {{ __('Save') }}
             </x-primary-button>
 
@@ -89,21 +89,29 @@ function checkPasswordMatch() {
     if (confirmPassword === '') {
         message.classList.add('hidden');
         submitBtn.disabled = false;
+        submitBtn.classList.remove('bg-gray-400', 'hover:bg-gray-400');
+        submitBtn.classList.add('bg-gray-900', 'hover:bg-gray-950');
         return;
     }
 
     if (password === confirmPassword) {
+        // Match - Active button
         message.textContent = "✓ Passwords match";
-        message.classList.remove('hidden');
+        message.classList.remove('hidden', 'text-red-600');
         message.classList.add('text-emerald-600');
-        message.classList.remove('text-red-600');
+
         submitBtn.disabled = false;
+        submitBtn.classList.remove('bg-gray-400', 'hover:bg-gray-400');
+        submitBtn.classList.add('bg-gray-900', 'hover:bg-gray-950');
     } else {
+        // No match - Disabled button
         message.textContent = "✕ Passwords do not match";
-        message.classList.remove('hidden');
+        message.classList.remove('hidden', 'text-emerald-600');
         message.classList.add('text-red-600');
-        message.classList.remove('text-emerald-600');
+
         submitBtn.disabled = true;
+        submitBtn.classList.remove('bg-gray-900', 'hover:bg-gray-950');
+        submitBtn.classList.add('bg-gray-400', 'hover:bg-gray-400');
     }
 }
 </script>
