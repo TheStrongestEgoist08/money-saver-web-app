@@ -24,7 +24,7 @@
             </div>
 
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
+                <div class="w-full">
                     @include('profile.partials.delete-user-form')
                 </div>
             </div>
