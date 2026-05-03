@@ -22,6 +22,7 @@
                 type="password"
                 class="mt-2 block w-full rounded-2xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 py-3.5 px-5 text-[15px] sm:text-[15.5px] transition-all duration-200"
                 autocomplete="current-password"
+                required
             />
             <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
         </div>
@@ -35,8 +36,9 @@
                 class="mt-2 block w-full rounded-2xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 py-3.5 px-5 text-[15px] sm:text-[15.5px] transition-all duration-200"
                 autocomplete="new-password"
                 pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,25}"
-                title="8-25 characters with uppercase, lowercase, number & special char."
+                title="8-25 characters with uppercase, lowercase, number & special character."
                 onkeyup="checkPasswordMatch()"
+                required
             />
             <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
         </div>
@@ -50,6 +52,7 @@
                 class="mt-2 block w-full rounded-2xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 py-3.5 px-5 text-[15px] sm:text-[15.5px] transition-all duration-200"
                 autocomplete="new-password"
                 onkeyup="checkPasswordMatch()"
+                required
             />
             <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
             <p id="password-match-message" class="mt-1 text-sm hidden"></p>
@@ -60,7 +63,7 @@
                 id="submit-btn"
                 class="px-8 py-3.5 sm:px-10 sm:py-4 text-white font-semibold rounded-2xl text-base transition-all duration-200 disabled:cursor-not-allowed"
             >
-                {{ __('Save') }}
+                {{ __('Save Changes') }}
             </x-primary-button>
 
             @if (session('status') === 'password-updated')
