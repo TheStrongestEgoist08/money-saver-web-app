@@ -10,7 +10,7 @@
         </p>
     </header>
 
-    <form method="post" action="{{ route('password.update') }}" class="mt-6 space-y-8">
+    <form method="post" action="{{ route('password.update') }}" class="mt-6 space-y-8" id="password-form">
         @csrf
         @method('put')
 
@@ -22,6 +22,7 @@
                 type="password"
                 class="mt-2 block w-full rounded-2xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 py-3.5 px-5 text-[15px] sm:text-[15.5px] transition-all duration-200"
                 autocomplete="current-password"
+                required
             />
             <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
         </div>
@@ -34,6 +35,10 @@
                 type="password"
                 class="mt-2 block w-full rounded-2xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 py-3.5 px-5 text-[15px] sm:text-[15.5px] transition-all duration-200"
                 autocomplete="new-password"
+                pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,25}"
+                title="8-25 characters with uppercase, lowercase, number & special char."
+                onkeyup="checkPasswordMatch()"
+                required
             />
             <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
         </div>
@@ -46,12 +51,15 @@
                 type="password"
                 class="mt-2 block w-full rounded-2xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 py-3.5 px-5 text-[15px] sm:text-[15.5px] transition-all duration-200"
                 autocomplete="new-password"
+                onkeyup="checkPasswordMatch()"
+                required
             />
             <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
+            <p id="password-match-message" class="mt-1 text-sm hidden"></p>
         </div>
 
         <div class="flex items-center gap-4 pt-4">
-            <x-primary-button class="px-8 py-3.5 sm:px-10 sm:py-4 bg-gray-900 hover:bg-gray-950 active:bg-black text-white font-semibold rounded-2xl text-base transition-all duration-200">
+            <x-primary-button class="px-8 py-3.5 sm:px-10 sm:py-4 bg-gray-900 hover:bg-gray-950 active:bg-black text-white font-semibold rounded-2xl text-base transition-all duration-200" id="submit-btn">
                 {{ __('Save') }}
             </x-primary-button>
 
@@ -70,3 +78,32 @@
         </div>
     </form>
 </section>
+
+<script>
+function checkPasswordMatch() {
+    const password = document.getElementById('update_password_password').value;
+    const confirmPassword = document.getElementById('update_password_password_confirmation').value;
+    const message = document.getElementById('password-match-message');
+    const submitBtn = document.getElementById('submit-btn');
+
+    if (confirmPassword === '') {
+        message.classList.add('hidden');
+        submitBtn.disabled = false;
+        return;
+    }
+
+    if (password === confirmPassword) {
+        message.textContent = "✓ Passwords match";
+        message.classList.remove('hidden');
+        message.classList.add('text-emerald-600');
+        message.classList.remove('text-red-600');
+        submitBtn.disabled = false;
+    } else {
+        message.textContent = "✕ Passwords do not match";
+        message.classList.remove('hidden');
+        message.classList.add('text-red-600');
+        message.classList.remove('text-emerald-600');
+        submitBtn.disabled = true;
+    }
+}
+</script>
