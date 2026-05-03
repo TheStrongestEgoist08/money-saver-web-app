@@ -83,38 +83,38 @@
 </section>
 
 <script>
-function checkPasswordMatch() {
-    const password = document.getElementById('update_password_password').value;
-    const confirmPassword = document.getElementById('update_password_password_confirmation').value;
-    const message = document.getElementById('password-match-message');
-    const submitBtn = document.getElementById('submit-btn');
+    function checkPasswordMatch() {
+        const password = document.getElementById('update_password_password').value;
+        const confirmPassword = document.getElementById('update_password_password_confirmation').value;
+        const message = document.getElementById('password-match-message');
+        const submitBtn = document.getElementById('submit-btn');
 
-    if (confirmPassword === '') {
-        message.classList.add('hidden');
-        submitBtn.disabled = false;
-        submitBtn.classList.remove('bg-gray-400', 'hover:bg-gray-400');
-        submitBtn.classList.add('bg-gray-900', 'hover:bg-gray-950');
-        return;
+        if (confirmPassword === '') {
+            message.classList.add('hidden');
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('bg-gray-400', 'hover:bg-gray-400');
+            submitBtn.classList.add('bg-gray-900', 'hover:bg-gray-950');
+            return;
+        }
+
+        if (password === confirmPassword) {
+            // Match - Active button
+            message.textContent = "✓ Passwords match";
+            message.classList.remove('hidden', 'text-red-600');
+            message.classList.add('text-emerald-600');
+
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('bg-gray-400', 'hover:bg-gray-400');
+            submitBtn.classList.add('bg-gray-900', 'hover:bg-gray-950');
+        } else {
+            // No match - Disabled button
+            message.textContent = "✕ Passwords do not match";
+            message.classList.remove('hidden', 'text-emerald-600');
+            message.classList.add('text-red-600');
+
+            submitBtn.disabled = true;
+            submitBtn.classList.remove('bg-gray-900', 'hover:bg-gray-950');
+            submitBtn.classList.add('bg-gray-400', 'hover:bg-gray-400');
+        }
     }
-
-    if (password === confirmPassword) {
-        // Match - Active button
-        message.textContent = "✓ Passwords match";
-        message.classList.remove('hidden', 'text-red-600');
-        message.classList.add('text-emerald-600');
-
-        submitBtn.disabled = false;
-        submitBtn.classList.remove('bg-gray-400', 'hover:bg-gray-400');
-        submitBtn.classList.add('bg-gray-900', 'hover:bg-gray-950');
-    } else {
-        // No match - Disabled button
-        message.textContent = "✕ Passwords do not match";
-        message.classList.remove('hidden', 'text-emerald-600');
-        message.classList.add('text-red-600');
-
-        submitBtn.disabled = true;
-        submitBtn.classList.remove('bg-gray-900', 'hover:bg-gray-950');
-        submitBtn.classList.add('bg-gray-400', 'hover:bg-gray-400');
-    }
-}
 </script>
