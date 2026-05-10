@@ -1,3 +1,4 @@
+
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -8,7 +9,6 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-2xl border border-gray-100">
-
                 <!-- Header Section -->
                 <div class="flex justify-between items-center px-8 py-6 border-b border-gray-100">
                     <div>
@@ -21,8 +21,7 @@
                     </div>
 
                     <!-- Flashing Button -->
-                    <button id="ai-btn"
-                            class="btn bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl flex items-center gap-3 font-medium transition-all duration-200 shadow-md hover:shadow-lg animate-pulse">
+                    <button id="ai-btn" class="btn bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl flex items-center gap-3 font-medium transition-all duration-200 shadow-md hover:shadow-lg animate-pulse">
                         <i class="fas fa-magic"></i>
                         Get AI Suggestions
                     </button>
@@ -82,7 +81,6 @@
 
                     if (data.success === true && data.suggestions) {
 
-                        // Create the result container
                         resultDiv.innerHTML = `
                             <div class="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
                                 <div class="px-8 py-5 bg-gradient-to-r from-indigo-50 to-white border-b border-gray-100 flex items-center gap-3">
@@ -101,28 +99,46 @@
                             </div>
                         `;
 
-                        // Typing Animation
+                        // Typing Animation with **bold** support
                         const typedContainer = document.getElementById('typed-text');
                         const fullText = data.suggestions;
                         let index = 0;
-                        
-                        // typing speed in ms (lower = faster)
-                        const speed = 1;
+                        const speed = 2; // typing speed (lower = faster)
 
                         function typeWriter() {
                             if (index < fullText.length) {
-                                // Handle new lines properly
-                                if (fullText.charAt(index) === '\n') {
-                                    typedContainer.innerHTML += '<br><br>';
-                                } else {
-                                    typedContainer.innerHTML += fullText.charAt(index);
+                                let chunk = '';
+
+                                // Handle **bold** text
+                                if (fullText.substring(index, index + 2) === '**') {
+                                    const closingIndex = fullText.indexOf('**', index + 2);
+
+                                    if (closingIndex !== -1) {
+                                        const boldText = fullText.substring(index + 2, closingIndex);
+                                        chunk = `<strong class="font-semibold text-gray-800">${boldText}</strong>`;
+                                        index = closingIndex + 2; // skip past closing **
+                                    } else {
+                                        chunk = fullText.charAt(index);
+                                        index++;
+                                    }
                                 }
-                                index++;
+                                // Handle new lines
+                                else if (fullText.charAt(index) === '\n') {
+                                    chunk = '<br><br>';
+                                    index++;
+                                }
+                                // Normal character
+                                else {
+                                    chunk = fullText.charAt(index);
+                                    index++;
+                                }
+
+                                typedContainer.innerHTML += chunk;
                                 setTimeout(typeWriter, speed);
                             }
                         }
 
-                        // Start typing after a small delay
+                        // Start typing
                         setTimeout(typeWriter, 300);
 
                     } else {
@@ -154,12 +170,12 @@
                         </div>
                     `;
                 } finally {
-                    // Hide loading and reset button
+                    // Reset UI
                     loading.classList.add('d-none');
 
                     aiBtn.disabled = false;
                     aiBtn.innerHTML = `<i class="fas fa-magic"></i> Get AI Suggestions`;
-                    aiBtn.classList.add('animate-pulse'); // restart flashing
+                    aiBtn.classList.add('animate-pulse');
                 }
             }
         });
