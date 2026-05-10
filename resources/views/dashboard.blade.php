@@ -9,9 +9,7 @@
 
     <div class="py-10">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
                 <!-- Welcome & Balance -->
                 <div class="lg:col-span-12">
                     <div class="bg-white shadow-xl shadow-gray-100/50 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -22,10 +20,10 @@
                             <p class="text-gray-500 mt-2 text-base md:text-lg">Here's what's happening with your money today</p>
                         </div>
 
-                        <a href="{{ route('user.balance') }}"
+                        <a href="{{ route('user.wallets') }}"
                            class="px-6 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-2xl flex items-center gap-3 hover:from-emerald-700 hover:to-teal-700 transition-all text-sm md:text-base">
                             <span>💰</span>
-                            <span>View Full Balance</span>
+                            <span>View Wallets</span>
                         </a>
                     </div>
                 </div>

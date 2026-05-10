@@ -8,13 +8,14 @@
     <div @click.away="openAddBalance = false"
          class="bg-white rounded-3xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
 
-        <!-- Modal Header -->
+        <!-- Header -->
         <div class="px-8 pt-6 pb-4 border-b">
             <h3 class="text-2xl font-semibold text-gray-900">Add Balance</h3>
         </div>
 
-        <form method="POST" action="{{ route('user.balance.add') }}">
+        <form method="POST" action="{{ route('user.wallets.add-balance') }}">
             @csrf
+            <input type="hidden" name="wallet_id" :value="selectedWalletId">
 
             <div class="p-8">
                 <div>
@@ -33,7 +34,7 @@
                 </div>
             </div>
 
-            <!-- Modal Footer -->
+            <!-- Footer -->
             <div class="p-6 border-t flex gap-3">
                 <button
                     type="button"

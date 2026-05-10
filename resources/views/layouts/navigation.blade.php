@@ -20,8 +20,8 @@
                 </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('user.balance')" :active="request()->routeIs('user.balance')">
-                        {{ __('Balance') }}
+                    <x-nav-link :href="route('user.wallets')" :active="request()->routeIs('user.wallets')">
+                        {{ __('Wallets') }}
                     </x-nav-link>
                 </div>
 
@@ -103,8 +103,8 @@
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('user.balance')" :active="request()->routeIs('user.balance')">
-                {{ __('Balance') }}
+            <x-responsive-nav-link :href="route('user.wallets')" :active="request()->routeIs('user.wallets')">
+                {{ __('Wallets') }}
             </x-responsive-nav-link>
 
             <x-responsive-nav-link :href="route('user.expenses')" :active="request()->routeIs('user.expenses')">

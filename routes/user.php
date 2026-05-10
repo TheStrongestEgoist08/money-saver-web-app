@@ -3,10 +3,11 @@
 use App\Http\Controllers\User\DashboardController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\User\ExpenseController;
-use App\Http\Controllers\User\BalanceController;
+use App\Http\Controllers\User\WalletController;
 use App\Http\Controllers\User\GoalsController;
 use App\Http\Controllers\User\ReportController;
 use App\Http\Controllers\User\SuggestionController;
+use App\Models\Wallet;
 
 # profile routes
 Route::controller(ProfileController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
@@ -36,12 +37,21 @@ Route::controller(ExpenseController::class)->middleware(['auth', 'verified'])->p
 });
 
 # balance route
-Route::controller(BalanceController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
-    Route::get('/balance', 'index')
-        ->name('user.balance');
+Route::controller(WalletController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
+    Route::get('/wallets', 'index')
+        ->name('user.wallets');
 
-    Route::post('/balance/add', 'addBalance')
-        ->name('user.balance.add');
+    Route::post('/wallets/store', 'store')
+        ->name('user.wallet.store');
+
+    Route::post('/wallets/add-balance', 'addBalance')
+        ->name('user.wallets.add-balance');
+
+    Route::post('/balance/transfer', 'transfer')
+        ->name('user.wallets.transfer');
+
+    Route::delete('/wallet/{wallet}', 'destroy')
+        ->name('user.wallet.destroy');
 });
 
 # goals route
