@@ -31,7 +31,7 @@
                             @click="openAddWallet = true"
                             class="px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-2xl flex items-center gap-2 shadow-lg shadow-emerald-200 transition-all active:scale-95">
                             <span class="text-xl leading-none">+</span>
-                            New Wallet
+                            Wallet
                         </button>
 
                         <button

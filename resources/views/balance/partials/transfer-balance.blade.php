@@ -2,7 +2,15 @@
 <!-- Transfer Balance Modal -->
 <div
     x-data="{
-        fromWalletId: null
+        fromWalletId: null,
+        toWalletId: null,
+        amount: null,
+        wallets: @js($wallets->mapWithKeys(fn($w) => [$w->id => $w->balance])),
+
+        get maxAmount() {
+            if (!this.fromWalletId) return 0;
+            return this.wallets[this.fromWalletId] || 0;
+        }
     }"
     x-show="openTransferModal"
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
@@ -30,7 +38,9 @@
                         class="w-full px-5 py-4 border border-gray-200 rounded-2xl focus:border-blue-500 outline-none">
                         <option value="">Select source wallet...</option>
                         @foreach($wallets as $wallet)
-                            <option value="{{ $wallet->id }}">
+                            <option
+                                value="{{ $wallet->id }}"
+                                :disabled="toWalletId == {{ $wallet->id }}">
                                 {{ $wallet->wallet_name ?? ucfirst($wallet->wallet_type) }}
                                 — ₱{{ number_format($wallet->balance, 2) }}
                             </option>
@@ -43,6 +53,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">To Wallet</label>
                     <select
                         name="to_wallet_id"
+                        x-model="toWalletId"
                         required
                         class="w-full px-5 py-4 border border-gray-200 rounded-2xl focus:border-blue-500 outline-none">
                         <option value="">Select destination wallet...</option>
@@ -58,7 +69,12 @@
 
                 <!-- Amount -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-3">Amount to Transfer</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Amount to Transfer
+                        <span x-show="fromWalletId" class="text-emerald-600 font-medium">
+                            (Max: ₱<span x-text="Number(maxAmount).toLocaleString('en-PH', {minimumFractionDigits: 2})"></span>)
+                        </span>
+                    </label>
                     <div class="relative">
                         <span class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500 text-2xl font-medium">₱</span>
                         <input
@@ -66,6 +82,8 @@
                             name="amount"
                             step="0.01"
                             min="0.01"
+                            :max="maxAmount"
+                            x-model.number="amount"
                             placeholder="0.00"
                             required
                             class="w-full pl-12 pr-6 py-5 border border-gray-200 rounded-2xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none text-3xl font-semibold">
@@ -76,7 +94,7 @@
             <div class="p-6 border-t flex gap-3">
                 <button
                     type="button"
-                    @click="openTransferModal = false; fromWalletId = null"
+                    @click="openTransferModal = false; fromWalletId = null; toWalletId = null"
                     class="flex-1 py-4 text-gray-600 font-medium rounded-2xl hover:bg-gray-100 transition-colors">
                     Cancel
                 </button>

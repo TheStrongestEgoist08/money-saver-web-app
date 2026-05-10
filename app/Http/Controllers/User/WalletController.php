@@ -23,9 +23,6 @@ class WalletController extends Controller
         return view('balance.index', compact('wallets'));
     }
 
-    /**
-     * Store New Wallet
-     */
     public function newWallet(Request $request)
     {
         if (!Auth::check()) {
@@ -63,14 +60,13 @@ class WalletController extends Controller
         }
     }
 
-    /**
-     * Add Balance to a Specific Wallet
-     */
     public function addBalance(Request $request)
     {
         if (!Auth::check()) {
             return redirect()->route('login');
         }
+
+        $user = Auth::user();
 
         $validatedData = $request->validate([
             'wallet_id' => ['required', 'exists:wallets,id'],
@@ -85,16 +81,21 @@ class WalletController extends Controller
                             ->firstOrFail();
 
             $wallet->balance += $validatedData['amount'];
+            $user->balance += $validatedData['amount'];
+
+            $user->save();
             $wallet->save();
 
             DB::commit();
 
-            return redirect()->route('user.wallets')
+            return redirect()
+                ->route('user.wallets')
                 ->with('success', 'Balance added successfully!');
         } catch (\Exception $e) {
             DB::rollback();
 
-            return redirect()->route('user.wallets')
+            return redirect()
+            ->route('user.wallets')
                 ->with('error', 'Failed to add balance. Please try again.');
         }
     }
@@ -118,9 +119,10 @@ class WalletController extends Controller
                               ->where('user_id', Auth::id())
                               ->firstOrFail();
 
-            if ($fromWallet->balance < $validated['amount'] || $fromWallet->balance == 0) {
-                return redirect()->route('user.wallets')
-                    ->with('error', 'Insufficient balance in source wallet.');
+            if ($fromWallet->balance < $validated['amount']) {
+                return redirect()
+                    ->route('user.wallets')
+                    ->with('error', 'Insufficient balance in the source wallet. Please check and try again.');
             }
 
             $fromWallet->decrement('balance', $validated['amount']);
@@ -146,7 +148,6 @@ class WalletController extends Controller
             abort(403);
         }
 
-        // Optional: Prevent deletion if balance exists
         if ($wallet->balance > 0) {
             return redirect()->route('user.wallets')
                 ->with('error', 'Cannot delete wallet with remaining balance. Please withdraw first.');
