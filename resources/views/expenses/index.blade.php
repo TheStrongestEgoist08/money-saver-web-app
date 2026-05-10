@@ -126,10 +126,8 @@
 
                 <!-- Main Content -->
                 <div class="p-8">
-
                     <!-- Expense Cards -->
                     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-
                         @forelse($expenses as $expense)
                             <div
                                 class="expense-card group relative bg-white border border-gray-200 hover:border-blue-200 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
@@ -143,8 +141,7 @@
                                 <div class="absolute inset-0 opacity-10 group-hover:opacity-15 transition-all duration-500 pointer-events-none overflow-hidden">
                                     <div class="absolute inset-0 flex flex-wrap justify-around items-center gap-6 text-5xl rotate-[-8deg]">
                                         @for($i = 0; $i < 12; $i++)
-                                            <span class="transition-all duration-700"
-                                                style="transform: rotate({{ rand(-25, 25) }}deg);">
+                                            <span class="transition-all duration-700" style="transform: rotate({{ rand(-25, 25) }}deg);">
                                                 @switch($expense->type)
                                                     @case('Food') 🍔 @break
                                                     @case('Groceries') 🛒 @break
