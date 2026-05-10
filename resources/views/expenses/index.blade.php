@@ -83,9 +83,7 @@
             },
          }"
     >
-
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-
             <!-- Modern Pie Chart Section -->
             @include('expenses.partials.graph')
 
