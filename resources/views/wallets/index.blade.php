@@ -109,8 +109,8 @@
         </div>
 
         <!-- Modals -->
-        @include('wallet.partials.add-wallet')
-        @include('wallet.partials.transfer-balance')
-        @include('wallet.partials.add-balance')
+        @include('wallets.partials.add-wallet')
+        @include('wallets.partials.transfer-balance')
+        @include('wallets.partials.add-balance')
     </div>
 </x-app-layout>
