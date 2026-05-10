@@ -20,7 +20,7 @@ class WalletController extends Controller
         $user = Auth::user();
         $wallets = $user->wallets()->latest()->get();
 
-        return view('balance.index', compact('wallets'));
+        return view('wallet.index', compact('wallets'));
     }
 
     public function newWallet(Request $request)
