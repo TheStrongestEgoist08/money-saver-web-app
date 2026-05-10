@@ -64,7 +64,7 @@
                                             </p>
                                         </div>
 
-                                        <span class="px-3 py-1 text-xs font-medium rounded-full
+                                        <span class="px-3 py-1 text-xs font-medium rounded-full capitalize
                                             {{ $wallet->wallet_type == 'bank' ? 'bg-blue-100 text-blue-700' :
                                             ($wallet->wallet_type == 'e-wallet' ? 'bg-purple-100 text-purple-700' : 'bg-emerald-100 text-emerald-700') }}">
                                             {{ $wallet->wallet_type }}
