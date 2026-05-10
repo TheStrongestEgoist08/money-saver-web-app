@@ -36,13 +36,13 @@ Route::controller(ExpenseController::class)->middleware(['auth', 'verified'])->p
         ->name('user.expenses.add');
 });
 
-# balance route
+# wallet route
 Route::controller(WalletController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
     Route::get('/wallets', 'index')
         ->name('user.wallets');
 
-    Route::post('/wallets/store', 'store')
-        ->name('user.wallet.store');
+    Route::post('/wallets/newWallet', 'newWallet')
+        ->name('user.wallet.newWallet');
 
     Route::post('/wallets/add-balance', 'addBalance')
         ->name('user.wallets.add-balance');

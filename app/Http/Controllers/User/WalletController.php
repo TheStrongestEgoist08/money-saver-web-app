@@ -26,7 +26,7 @@ class WalletController extends Controller
     /**
      * Store New Wallet
      */
-    public function store(Request $request)
+    public function newWallet(Request $request)
     {
         if (!Auth::check()) {
             return redirect()->route('login');
@@ -51,12 +51,14 @@ class WalletController extends Controller
 
             DB::commit();
 
-            return redirect()->route('user.balance')
+            return redirect()
+                ->route('user.wallets')
                 ->with('success', 'Wallet created successfully!');
         } catch (\Exception $e) {
             DB::rollback();
 
-            return redirect()->route('user.wallets')
+            return redirect()
+                ->route('user.wallets')
                 ->with('error', 'Failed to create wallet. Please try again.');
         }
     }

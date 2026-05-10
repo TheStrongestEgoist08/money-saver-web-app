@@ -138,3 +138,85 @@
         </div>
     </div>
 </nav>
+
+{{-- Modern Toast Notifications --}}
+<div id="toast-container"
+     class="fixed top-6 right-6 z-[9999] flex flex-col gap-3 items-end max-w-sm w-full pointer-events-none">
+</div>
+
+<script>
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    const accent = type === 'success' ? 'emerald' : 'red';
+    const progressColor = type === 'success' ? 'emerald-600' : 'red-600';
+
+    const toast = document.createElement('div');
+    toast.className = `toast group bg-white border border-gray-100 shadow-2xl
+                       flex items-center gap-4 px-5 py-4 rounded-2xl w-full max-w-xs
+                       pointer-events-auto relative overflow-hidden`;
+
+    toast.innerHTML = `
+        <!-- Bell Icon -->
+        <div class="flex-shrink-0">
+            <div class="w-9 h-9 rounded-2xl bg-${accent}-100 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-bell-fill text-${accent}-600" viewBox="0 0 16 16">
+                    <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2m.995-14.901a1 1 0 1 0-1.99 0A5 5 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Message -->
+        <div class="flex-1 text-[15px] leading-tight font-medium text-gray-800 pr-3">
+            ${message}
+        </div>
+
+        <!-- Close Button -->
+        <button onclick="dismissToast(this)"
+                class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-xl text-gray-400 hover:text-gray-500 hover:bg-gray-100 transition-all text-3xl leading-none">
+            ×
+        </button>
+
+        <!-- Progress Bar - For Both Success & Error -->
+        <div class="absolute bottom-0 left-0 right-0 h-1 bg-gray-100 rounded-b-2xl overflow-hidden">
+            <div class="progress h-full bg-${progressColor} w-full origin-left rounded-b-2xl"></div>
+        </div>
+    `;
+
+    container.appendChild(toast);
+
+    // Entrance animation
+    setTimeout(() => {
+        toast.style.transform = 'translateX(0)';
+        toast.style.opacity = '1';
+    }, 10);
+
+    // Auto dismiss + progress for both types
+    const progress = toast.querySelector('.progress');
+    if (progress) {
+        progress.style.transition = 'width 4.8s linear';
+        setTimeout(() => progress.style.width = '0%', 50);
+    }
+
+    setTimeout(() => dismissToast(toast), 4800);
+}
+
+function dismissToast(el) {
+    const toast = el.closest('.toast') || el;
+    toast.style.transition = 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)';
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(100px) scale(0.95)';
+
+    setTimeout(() => toast.remove(), 350);
+}
+
+// Show Laravel Session Messages
+document.addEventListener('DOMContentLoaded', () => {
+    @if (session('success'))
+        showToast("{{ addslashes(session('success')) }}", 'success');
+    @endif
+
+    @if (session('error'))
+        showToast("{{ addslashes(session('error')) }}", 'error');
+    @endif
+});
+</script>

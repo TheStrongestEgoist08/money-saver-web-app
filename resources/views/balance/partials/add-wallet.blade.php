@@ -13,7 +13,7 @@
             <h3 class="text-2xl font-semibold text-gray-900">Add New Wallet</h3>
         </div>
 
-        <form method="POST" action="{{ route('user.wallet.store') }}">
+        <form method="POST" action="{{ route('user.wallet.newWallet') }}">
             @csrf
 
             <div class="p-8 space-y-6">
