@@ -95,7 +95,7 @@
     <section id="how-it-works" class="bg-zinc-900 py-20">
         <div class="max-w-5xl mx-auto px-6">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-semibold mb-3">How MoneySaver Works</h2>
+                <h2 class="text-3xl font-semibold mb-3">How MoneyTrackr Works</h2>
                 <p class="text-zinc-400">Just 3 simple steps to start saving smarter</p>
             </div>
 
