@@ -14,17 +14,17 @@
         }
     }"
 >
-
-    <div @click.away="closeModal()"
-         class="bg-white rounded-3xl shadow-2xl w-full max-w-md mx-auto overflow-hidden"
-         style="max-height: 90vh;">
+    <div
+        @click.away="closeModal()"
+        class="bg-white rounded-3xl shadow-2xl w-full max-w-md mx-auto overflow-hidden"
+        style="max-height: 100vh;">
 
         <!-- Header -->
         <div class="px-6 pt-6 pb-4 border-b border-gray-100 flex-shrink-0">
             <div class="flex justify-between items-center">
                 <div>
                     <h2 class="text-2xl font-semibold text-gray-900">New Expense</h2>
-                    <p class="text-sm text-gray-500">Add multiple at once</p>
+                    <p class="text-sm text-gray-500">Add multiple expenses at once</p>
                 </div>
             </div>
         </div>
@@ -33,9 +33,10 @@
             method="POST"
             action="{{ route('user.expenses.add') }}"
             class="flex flex-col"
-            style="max-height: calc(90vh - 140px);"
+            style="max-height: calc(100vh - 140px);"
             x-data="{
                 expenses: [{ expense_name: '', type: '', quantity: 1, price: '', description: '' }],
+                selectedWallet: '',
 
                 addExpense() {
                     this.expenses.push({ expense_name: '', type: '', quantity: 1, price: '', description: '' })
@@ -141,6 +142,7 @@
 
             <!-- Fixed Bottom Section -->
             <div class="p-6 border-t border-gray-100 flex-shrink-0 space-y-4 bg-white">
+
                 <button
                     type="button"
                     @click="addExpense()"
@@ -148,9 +150,29 @@
                     + Add Another Expense
                 </button>
 
+                <!-- Total -->
                 <div class="bg-blue-50 rounded-2xl p-4 flex justify-between items-center">
-                    <span class="font-medium text-gray-700">Total</span>
+                    <span class="font-medium text-gray-700">Total Amount</span>
                     <span class="text-2xl font-bold text-blue-700" x-text="`₱${getTotal()}`"></span>
+                </div>
+
+                <!-- Wallet Selection (Moved here) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Pay from Wallet
+                    </label>
+                    <select
+                        x-model="selectedWallet"
+                        name="wallet_id"
+                        class="w-full px-4 py-3.5 bg-white border border-gray-200 focus:border-blue-500 rounded-2xl text-base"
+                        required>
+                        <option value="">Select Wallet</option>
+                        @foreach($wallets as $wallet)
+                            <option value="{{ $wallet->id }}">
+                                {{ $wallet->wallet_name }} (₱{{ number_format($wallet->balance, 2) }})
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <div class="flex gap-3">
@@ -161,7 +183,7 @@
                     <button
                         type="submit"
                         class="flex-1 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl">
-                        Save All
+                        Save All Expenses
                     </button>
                 </div>
             </div>

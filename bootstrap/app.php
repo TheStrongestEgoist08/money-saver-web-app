@@ -11,7 +11,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'track.transaction' => \App\Http\Middleware\TrackTransaction::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

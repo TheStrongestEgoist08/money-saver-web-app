@@ -25,7 +25,9 @@ class DashboardController extends Controller
             ->sum('total');
 
         // Total Transactions (All time)
-        $totalTransactions = Expense::where('user_id', $user->id)->count();
+        $totalTransactionsThisMonth = Expense::where('user_id', $user->id)
+            ->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
+            ->count();
 
         // Recent Expenses (Latest 5)
         $recentExpenses = Expense::where('user_id', $user->id)
@@ -54,7 +56,7 @@ class DashboardController extends Controller
         return view('dashboard', compact(
             'userBalance',
             'totalExpensesThisMonth',
-            'totalTransactions',
+            'totalTransactionsThisMonth',
             'recentExpenses',
             'categoryLabels',
             'categoryAmounts',

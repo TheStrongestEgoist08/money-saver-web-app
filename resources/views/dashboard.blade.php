@@ -32,7 +32,7 @@
                 <div class="lg:col-span-4">
                     <div class="bg-white shadow-xl shadow-gray-100/50 rounded-3xl p-6 md:p-8 h-full">
                         <div class="flex items-center justify-between mb-6">
-                            <p class="text-gray-500 font-medium text-sm md:text-base">Current Balance</p>
+                            <p class="text-gray-500 font-medium text-sm md:text-base">Total Balance</p>
                             <span class="text-2xl">💵</span>
                         </div>
                         <p class="text-4xl md:text-5xl font-bold text-gray-900 tracking-tighter">
@@ -56,11 +56,11 @@
                 <div class="lg:col-span-4">
                     <div class="bg-white shadow-xl shadow-gray-100/50 rounded-3xl p-6 md:p-8 h-full">
                         <div class="flex items-center justify-between mb-6">
-                            <p class="text-gray-500 font-medium text-sm md:text-base">Total Transactions</p>
+                            <p class="text-gray-500 font-medium text-sm md:text-base">Transactions This Month</p>
                             <span class="text-2xl">🔢</span>
                         </div>
                         <p class="text-4xl md:text-5xl font-bold text-gray-900 tracking-tighter">
-                            {{ $totalTransactions ?? 0 }}
+                            {{ $totalTransactionsThisMonth ?? 0 }}
                         </p>
                     </div>
                 </div>

@@ -6,24 +6,42 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->enum('type', ['', '']);
+
+            $table->foreignId('user_id')
+                ->constrained('users')
+                ->onDelete('cascade');
+
+            $table->foreignId('wallet_id')
+                ->nullable()
+              ->constrained('wallets')
+              ->onDelete('set null');
+
+            $table->enum('type', [
+                'Balance Added',
+                'Expense',
+                'Transfer',
+                'Wallet Created',
+                'Wallet Deleted',
+            ])->default('Expense');
+
+            $table->decimal('amount', 15, 2)->default(0.00);
+
+            $table->string('description')->nullable();
+
+            $table->json('metadata')->nullable();
+
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->index(['user_id', 'type']);
+            $table->index(['wallet_id', 'type']);
+            $table->index('created_at');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('transactions');

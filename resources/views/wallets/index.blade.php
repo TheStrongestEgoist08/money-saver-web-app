@@ -88,7 +88,7 @@
                                         </button>
 
                                         <!-- Delete Button -->
-                                        <form action="{{ route('user.wallet.destroy', $wallet) }}" method="POST"
+                                        <form action="{{ route('user.wallets.destroy', $wallet) }}" method="POST"
                                             onsubmit="return confirm('Are you sure you want to delete this wallet?')">
                                             @csrf
                                             @method('DELETE')
