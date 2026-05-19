@@ -1,4 +1,5 @@
 
+{{-- Landing Page --}}
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -57,7 +58,7 @@
             </div>
 
             <h1 class="text-5xl lg:text-6xl font-semibold leading-tight tracking-tighter">
-                Simple money tracking, no stress.
+                Money tracking,<br>made refreshingly simple.
             </h1>
 
             <p class="text-xl text-zinc-400">
