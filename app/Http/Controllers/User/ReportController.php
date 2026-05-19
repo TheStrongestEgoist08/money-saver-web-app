@@ -19,10 +19,13 @@ class ReportController extends Controller
     {
         $query = Expense::where('user_id', Auth::id());
 
+        # dd($request->all());
+
         // === Date Filter ===
         if ($request->filled('date_from')) {
             $query->whereDate('created_at', '>=', $request->date_from);
         }
+
         if ($request->filled('date_to')) {
             $query->whereDate('created_at', '<=', $request->date_to);
         }

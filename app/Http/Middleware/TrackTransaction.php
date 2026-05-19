@@ -63,12 +63,46 @@ class TrackTransaction
         }
     }
 
+    /**
+     * Log expenses based on the request data.
+     *
+     * @param array $data
+     * @param \Illuminate\Http\Request $request
+     * @return void
+     */
     private function logExpense(&$data, Request $request)
     {
-        $data['type'] = 'Expense';
-        $data['amount'] = abs($request->input('amount', 0)) * -1;
-        $data['wallet_id'] = $request->input('wallet_id');
-        $data['description'] = $request->input('description') ?? 'Expense added';
+        $expenses = $request->input('expenses', []);
+
+        if (is_array($expenses) && count($expenses) > 0) {
+
+            foreach ($expenses as $expense) {
+                $quantity = $expense['quantity'] ?? 1;
+                $price    = $expense['price'] ?? 0;
+                $total    = $quantity * $price;
+
+                $expenseData = $data;
+
+                $expenseData['type']        = 'Expense';
+                $expenseData['amount']      = $total * -1;
+                $expenseData['wallet_id']   = $request->input('wallet_id');
+                $expenseData['description'] = $expense['description'] ?? 'Expense: ' . ($expense['expense_name'] ?? 'Unknown');
+
+                $expenseData['metadata'] = [
+                    'expense_name'  => $expense['expense_name'] ?? null,
+                    'expense_type'  => $expense['type'] ?? null,
+                    'quantity'      => $quantity,
+                    'price'         => $price,
+                    'total'         => $total,
+                ];
+
+                if (!empty($expense['meta']) && is_array($expense['meta'])) {
+                    $expenseData['metadata'] = array_merge($expenseData['metadata'], $expense['meta']);
+                }
+
+                Transaction::create($expenseData);
+            }
+        }
     }
 
     /**

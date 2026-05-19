@@ -129,12 +129,14 @@
     let datePicker;
 
     document.addEventListener('DOMContentLoaded', () => {
-        datePicker = flatpickr("#dateRange", {
-            mode: "range",
-            dateFormat: "Y-m-d",
-        });
+        setTimeout(() => {
+            datePicker = flatpickr("#dateRange", {
+                mode: "range",
+                dateFormat: "Y-m-d",
+            });
 
-        loadReports();
+            loadReports();
+        }, 100);
     });
 
     function clearAllFilters() {
@@ -150,10 +152,19 @@
         const dateRange = document.getElementById('dateRange').value;
 
         if (type) formData.append('type', type);
+
         if (dateRange) {
             const dates = dateRange.split(' to ');
-            if (dates[0]) formData.append('date_from', dates[0]);
-            if (dates[1]) formData.append('date_to', dates[1]);
+
+            // Single date selected
+            if (dates.length === 1 || !dates[1]) {
+                formData.append('date_from', dates[0]);
+                formData.append('date_to', dates[0]);
+            } else {
+                // Date range selected
+                formData.append('date_from', dates[0]);
+                formData.append('date_to', dates[1]);
+            }
         }
 
         document.getElementById('tableBody').innerHTML = `
