@@ -32,6 +32,12 @@
                 </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('user.transactions')" :active="request()->routeIs('user.transactions')">
+                        {{ __('Transactions') }}
+                    </x-nav-link>
+                </div>
+
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link>
                         {{ __('Goals') }}
                     </x-nav-link>
@@ -39,19 +45,13 @@
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('user.reports')" :active="request()->routeIs('user.reports')">
-                        {{ __('Report') }}
+                        {{ __('Reports') }}
                     </x-nav-link>
                 </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('user.suggestions')" :active="request()->routeIs('user.suggestions')">
-                        {{ __('AI Suggestions') }}
-                    </x-nav-link>
-                </div>
-
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('user.transactions')" :active="request()->routeIs('user.transactions')">
-                        {{ __('Transactions') }}
+                        {{ __('AI') }}
                     </x-nav-link>
                 </div>
             </div>
@@ -74,10 +74,6 @@
                     <x-slot name="content">
                         <x-dropdown-link :href="route('user.profile.edit')">
                             {{ __('Profile') }}
-                        </x-dropdown-link>
-
-                        <x-dropdown-link :href="route('welcome')">
-                            {{ __('Homepage') }}
                         </x-dropdown-link>
 
                         <!-- Authentication -->
@@ -119,6 +115,22 @@
 
             <x-responsive-nav-link :href="route('user.expenses')" :active="request()->routeIs('user.expenses')">
                 {{ __('Expenses') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('user.transactions')" :active="request()->routeIs('user.transactions')">
+                {{ __('Transactions') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('user.goals')" :active="request()->routeIs('user.goals')">
+                {{ __('Goals') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('user.reports')" :active="request()->routeIs('user.reports')">
+                {{ __('Reports') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('user.suggestions')" :active="request()->routeIs('user.suggestions')">
+                {{ __('AI') }}
             </x-responsive-nav-link>
         </div>
 
