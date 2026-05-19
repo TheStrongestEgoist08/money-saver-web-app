@@ -7,10 +7,10 @@ use App\Http\Controllers\User\WalletController;
 use App\Http\Controllers\User\GoalsController;
 use App\Http\Controllers\User\ReportController;
 use App\Http\Controllers\User\SuggestionController;
-use App\Models\Wallet;
+use App\Http\Controllers\User\TransactionController;
 
-# profile routes
-Route::controller(ProfileController::class)->middleware(['auth', 'verified', 'track.transaction'])->prefix('user')->group(function() {
+# Profile routes
+Route::controller(ProfileController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
     Route::get('/profile', 'edit')
         ->name('user.profile.edit');
 
@@ -21,13 +21,13 @@ Route::controller(ProfileController::class)->middleware(['auth', 'verified', 'tr
         ->name('user.profile.destroy');
 });
 
-# dashboard routes
-Route::controller(DashboardController::class)->middleware(['auth', 'verified', 'track.transaction'])->prefix('user')->group(function() {
+# Dashboard routes
+Route::controller(DashboardController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
     Route::get('/dashboard', 'index')
         ->name('user.dashboard');
 });
 
-# expense route
+# Expense route
 Route::controller(ExpenseController::class)->middleware(['auth', 'verified', 'track.transaction'])->prefix('user')->group(function() {
     Route::get('/expenses', 'index')
         ->name('user.expenses');
@@ -36,7 +36,7 @@ Route::controller(ExpenseController::class)->middleware(['auth', 'verified', 'tr
         ->name('user.expenses.add');
 });
 
-# wallet route
+# Wallet route
 Route::controller(WalletController::class)->middleware(['auth', 'verified', 'track.transaction'])->prefix('user')->group(function() {
     Route::get('/wallets', 'index')
         ->name('user.wallets');
@@ -54,14 +54,14 @@ Route::controller(WalletController::class)->middleware(['auth', 'verified', 'tra
         ->name('user.wallets.destroy');
 });
 
-# goals route
-Route::controller(GoalsController::class)->middleware(['auth', 'verified', 'track.transaction'])->prefix('user')->group(function() {
+# Goals route
+Route::controller(GoalsController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
     Route::get('/goals', 'index')
         ->name('user.goals');
 });
 
-# report route
-Route::controller(ReportController::class)->middleware(['auth', 'verified', 'track.transaction'])->prefix('user')->group(function() {
+# Report route
+Route::controller(ReportController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
     Route::get('/reports', 'index')
         ->name('user.reports');
 
@@ -73,10 +73,19 @@ Route::controller(ReportController::class)->middleware(['auth', 'verified', 'tra
 });
 
 # Suggestion route
-Route::controller(SuggestionController::class)->middleware(['auth', 'verified', 'track.transaction'])->prefix('user')->group(function() {
+Route::controller(SuggestionController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
     Route::get('/suggestions', 'index')
         ->name('user.suggestions');
 
     Route::get('/suggestions/ai', 'aiSuggestions')
         ->name('user.suggestions.ai');
+});
+
+# Transaction route
+Route::controller(TransactionController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
+    Route::get('/transactions', 'index')
+        ->name('user.transactions');
+
+    Route::get('/transactions/filter', 'filter')
+        ->name('user.transactions.filter');
 });

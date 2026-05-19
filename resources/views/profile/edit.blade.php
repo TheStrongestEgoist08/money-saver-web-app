@@ -2,8 +2,8 @@
 {{-- Profile Edit Page --}}
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile') }}
+        <h2 class="font-semibold text-2xl md:text-3xl text-gray-800 tracking-tight">
+            {{ __('Profile Details') }}
         </h2>
     </x-slot>
 

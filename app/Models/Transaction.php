@@ -18,8 +18,10 @@ class Transaction extends Model
     ];
 
     protected $casts = [
-        'amount' => 'decimal:2',
-        'metadata' => 'array',
+        'amount'     => 'decimal:2',
+        'metadata'   => 'array',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function user(): BelongsTo
@@ -30,10 +32,5 @@ class Transaction extends Model
     public function wallet(): BelongsTo
     {
         return $this->belongsTo(Wallet::class);
-    }
-
-    public function reference(): MorphTo
-    {
-        return $this->morphTo();
     }
 }
