@@ -106,8 +106,8 @@ class ReportController extends Controller
             ->values();
 
         // Get chart images from frontend
-        $barChartImage = $request->get('bar_chart');
-        $lineChartImage = $request->get('line_chart');
+        $barChartImage = $request->input('bar_chart');
+        $lineChartImage = $request->input('line_chart');
 
         $pdf = Pdf::loadView('reports.partials.pdf', compact(
             'expenses',

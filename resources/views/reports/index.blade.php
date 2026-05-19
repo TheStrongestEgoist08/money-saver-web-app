@@ -112,7 +112,6 @@
                     </table>
                 </div>
             </div>
-
         </div>
     </div>
 </x-app-layout>
@@ -349,7 +348,6 @@
     }
 
     async function exportToPDF() {
-        // (Keep your existing export function - I can improve it later if needed)
         const btn = event.currentTarget;
         const originalText = btn.innerHTML;
         btn.innerHTML = 'Generating PDF...';
@@ -357,15 +355,53 @@
 
         try {
             if (typeof html2canvas === 'undefined') {
-                alert("html2canvas is not loaded.");
+                alert("html2canvas is not loaded. Please refresh the page.");
                 return;
             }
 
-            // You can keep or improve this part later
-            alert("PDF Export is under development. Please make sure data is loaded first.");
+            const options = {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#ffffff',
+                width: 1250,
+                height: 520,
+                logging: false,
+            };
+
+            const barCanvas = await html2canvas(document.getElementById('expenseBarChart'), options);
+            const lineCanvas = await html2canvas(document.getElementById('expenseLineChart'), options);
+
+            const barImage = barCanvas.toDataURL('image/png', 0.92);
+            const lineImage = lineCanvas.toDataURL('image/png', 0.92);
+
+            const formData = new FormData();
+            formData.append('type', document.getElementById('typeSelect').value || '');
+            formData.append('date_range', document.getElementById('dateRange').value || '');
+            formData.append('bar_chart', barImage);
+            formData.append('line_chart', lineImage);
+
+            const response = await fetch("{{ route('user.reports.export-pdf') }}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                }
+            });
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Formal_Expense_Report_${new Date().toISOString().replace(/[:.]/g, '-')}.pdf`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+            } else {
+                alert('Failed to generate PDF');
+            }
         } catch (error) {
             console.error(error);
-            alert('Error generating PDF.');
+            alert('Error generating PDF. Please check console.');
         } finally {
             btn.innerHTML = originalText;
             btn.disabled = false;
