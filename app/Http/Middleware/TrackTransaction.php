@@ -74,35 +74,47 @@ class TrackTransaction
     {
         $expenses = $request->input('expenses', []);
 
-        if (is_array($expenses) && count($expenses) > 0) {
-
-            foreach ($expenses as $expense) {
-                $quantity = $expense['quantity'] ?? 1;
-                $price    = $expense['price'] ?? 0;
-                $total    = $quantity * $price;
-
-                $expenseData = $data;
-
-                $expenseData['type']        = 'Expense';
-                $expenseData['amount']      = $total * -1;
-                $expenseData['wallet_id']   = $request->input('wallet_id');
-                $expenseData['description'] = $expense['description'] ?? 'Expense: ' . ($expense['expense_name'] ?? 'Unknown');
-
-                $expenseData['metadata'] = [
-                    'expense_name'  => $expense['expense_name'] ?? null,
-                    'expense_type'  => $expense['type'] ?? null,
-                    'quantity'      => $quantity,
-                    'price'         => $price,
-                    'total'         => $total,
-                ];
-
-                if (!empty($expense['meta']) && is_array($expense['meta'])) {
-                    $expenseData['metadata'] = array_merge($expenseData['metadata'], $expense['meta']);
-                }
-
-                Transaction::create($expenseData);
-            }
+        if (empty($expenses) || !is_array($expenses)) {
+            return;
         }
+
+        $totalAmount = 0;
+        $expenseDetails = [];
+
+        foreach ($expenses as $expense) {
+            $quantity = $expense['quantity'] ?? 1;
+            $price    = $expense['price'] ?? 0;
+            $total    = $quantity * $price;
+
+            $totalAmount += $total;
+
+            $expenseDetails[] = [
+                'expense_name' => $expense['expense_name'] ?? null,
+                'type'         => $expense['type'] ?? null,
+                'quantity'     => $quantity,
+                'price'        => $price,
+                'total'        => $total,
+                'description'  => $expense['description'] ?? null,
+            ];
+        }
+
+        // Prepare main transaction data
+        $transactionData = $data;
+
+        $transactionData['type']        = 'Expense';
+        $transactionData['amount']      = $totalAmount;
+        $transactionData['wallet_id']   = $request->input('wallet_id');
+        $transactionData['description'] = 'Multiple Expenses (' . count($expenses) . ')';
+
+        // Store all expenses in metadata
+        $transactionData['metadata'] = [
+            'expenses'      => $expenseDetails,
+            'total_expenses'=> count($expenses),
+            'total_amount'  => $totalAmount,
+        ];
+
+        // Create only ONE transaction
+        Transaction::create($transactionData);
     }
 
     /**
@@ -135,6 +147,7 @@ class TrackTransaction
         $fromWallet = Wallet::findOrFail($fromWalletId);
         $toWallet = Wallet::findOrFail($toWalletId);
 
+        $data['wallet_id'] = $fromWalletId;
         $data['type'] = 'Transfer';
         $data['amount'] = abs($request->input('amount', 0));
         $data['description'] = 'Transfer between wallets';

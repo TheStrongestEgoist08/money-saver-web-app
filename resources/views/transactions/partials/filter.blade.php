@@ -44,15 +44,14 @@
 
         {{-- Actions --}}
         <div class="flex items-end gap-3">
-            <button type="submit"
-                    class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-2xl px-5 py-3 transition-all shadow-lg shadow-emerald-100">
-                Filter
-            </button>
-
             <a href=""
                 class="px-5 py-3 rounded-2xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all">
                 Reset
             </a>
+
+            <button type="submit" class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-2xl px-5 py-3 transition-all shadow-lg shadow-emerald-100">
+                Apply
+            </button>
         </div>
     </form>
 </div>
