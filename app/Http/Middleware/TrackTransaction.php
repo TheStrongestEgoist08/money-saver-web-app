@@ -104,7 +104,7 @@ class TrackTransaction
         $transactionData['type']        = 'Expense';
         $transactionData['amount']      = $totalAmount;
         $transactionData['wallet_id']   = $request->input('wallet_id');
-        $transactionData['description'] = 'Multiple Expenses (' . count($expenses) . ')';
+        $transactionData['description'] = 'No. of Expenses (' . count($expenses) . ')';
 
         // Store all expenses in metadata
         $transactionData['metadata'] = [

@@ -35,6 +35,7 @@
             class="flex flex-col"
             style="max-height: calc(100vh - 140px);"
             x-data="{
+                submitting: false,
                 expenses: [{ expense_name: '', type: '', quantity: 1, price: '', description: '' }],
                 selectedWallet: '',
 
@@ -52,7 +53,7 @@
                     }, 0).toFixed(2);
                 }
             }"
-            @submit="handleSubmit"
+            @submit="submitting = true"
         >
             @csrf
 
@@ -182,8 +183,11 @@
                         class="flex-1 py-4 bg-gray-100 hover:bg-gray-200 rounded-2xl font-medium">Cancel</button>
                     <button
                         type="submit"
-                        class="flex-1 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl">
-                        Save All Expenses
+                        :disabled="submitting"
+                        class="flex-1 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl"
+                    >
+                        <span x-show="!submitting">Save All Expenses</span>
+                        <span x-show="submitting">Saving...</span>
                     </button>
                 </div>
             </div>
