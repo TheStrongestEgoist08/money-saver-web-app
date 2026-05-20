@@ -16,13 +16,6 @@ class TransactionController extends Controller
             ->latest()
             ->paginate(10);
 
-        $transactions->setCollection(
-            $transactions->getCollection()->groupBy([
-                'type',
-                fn ($item) => $item->created_at->format('Y-m-d')
-            ])
-        );
-
         # dd($transactions);
 
         return view('transactions.index', [
@@ -30,7 +23,8 @@ class TransactionController extends Controller
         ]);
     }
 
-    public function filter (Request $request) {
+    public function filter (Request $request)
+    {
 
     }
 }
