@@ -166,8 +166,10 @@ class TrackTransaction
      */
     private function logNewWallet(&$data, Request $request)
     {
+        $walletName = $request->input('wallet_name');
+
         $data['type'] = 'Wallet Created';
-        $data['description'] = 'New wallet created';
+        $data['description'] = $walletName ? "Wallet created: {$walletName}" : 'New wallet created';
     }
 
     /**
@@ -179,7 +181,13 @@ class TrackTransaction
      */
     private function logDeleteWallet(&$data, Request $request)
     {
+        $wallet = $request->route('wallet');
+
+        $walletName = $wallet?->wallet_name;
+
         $data['type'] = 'Wallet Deleted';
-        $data['description'] = 'Wallet deleted';
+        $data['description'] = $walletName ? "Wallet deleted: {$walletName}" : 'Wallet deleted';
+
+        $data['type'] = 'Wallet Deleted';
     }
 }
