@@ -38,7 +38,7 @@
                 </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link>
+                    <x-nav-link :href="route('user.goals')" :active="request()->routeIs('user.goals')">
                         {{ __('Goals') }}
                     </x-nav-link>
                 </div>

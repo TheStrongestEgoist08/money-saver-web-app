@@ -2,7 +2,9 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-2xl md:text-3xl text-gray-800 tracking-tight">Expense Reports</h2>
+            <h2 class="font-semibold text-2xl md:text-3xl text-gray-800 tracking-tight">
+                📊 Expense Reports
+            </h2>
 
             <button onclick="exportToPDF()"
                     class="flex items-center gap-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-semibold px-6 py-3 rounded-2xl transition-all shadow-md">
