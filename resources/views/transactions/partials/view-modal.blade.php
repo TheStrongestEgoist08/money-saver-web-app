@@ -3,7 +3,7 @@
 <div
     x-show="show"
     x-transition
-    class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-4 capitalize"
+    class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-4 capitalize backdrop-blur-md"
     style="display: none;"
     x-init="
         $watch('show', value => {

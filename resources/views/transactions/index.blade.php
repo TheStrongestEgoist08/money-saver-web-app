@@ -1,3 +1,4 @@
+
 {{-- User Transactions Page --}}
 <x-app-layout>
     <x-slot name="header">
@@ -10,7 +11,6 @@
         class="py-8 md:py-10"
         x-data="transactionModal()"
     >
-
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             {{-- Filters --}}
             @include('transactions.partials.filter')
