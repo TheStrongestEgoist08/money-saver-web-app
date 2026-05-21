@@ -58,6 +58,9 @@ Route::controller(WalletController::class)->middleware(['auth', 'verified', 'tra
 Route::controller(GoalsController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
     Route::get('/goals', 'index')
         ->name('user.goals');
+
+    Route::post('goals/store', 'store')
+        ->name('user.goals.store');
 });
 
 # Report route

@@ -13,6 +13,34 @@ return new class extends Migration
     {
         Schema::create('goals', function (Blueprint $table) {
             $table->id();
+
+            $table->foreignId('user_id')
+                ->constrained()
+                ->cascadeOnDelete();
+
+            $table->string('goal_name');
+
+            $table->decimal('target_amount', 12, 2);
+
+            $table->decimal('saved_amount', 12, 2)
+                ->default(0);
+
+            $table->date('target_date')
+                ->nullable();
+
+            $table->enum('status', [
+                'active',
+                'completed',
+                'cancelled',
+                'failed',
+            ])->default('active');
+
+            $table->text('description')
+                ->nullable();
+
+            $table->string('image')
+                ->nullable();
+
             $table->timestamps();
         });
     }

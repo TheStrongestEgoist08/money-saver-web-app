@@ -180,6 +180,7 @@
                                     : 'text-emerald-600' }}">
 
                                 {{ strtolower($transaction->type) === 'expense' ? '-' : '+' }}
+
                                 ₱{{ number_format($transaction->amount, 2) }}
                             </div>
                         </div>
