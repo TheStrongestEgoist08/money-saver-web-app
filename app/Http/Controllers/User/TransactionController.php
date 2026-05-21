@@ -25,6 +25,24 @@ class TransactionController extends Controller
 
     public function filter (Request $request)
     {
+        $validated_data = $request->validate([
+            'type' => [
+                'nullable',
+                'string',
+                'in:Expense,Transfer,Wallet Added,Wallet Deleted,Balance Added'
+            ]
+        ]);
 
+        $transactions = Transaction::where('user_id', Auth::id())
+            ->when($request->filled('type'), function ($query) use ($validated_data) {
+                $query->where('type', $validated_data['type']);
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('transactions.index', [
+            'transactions' => $transactions,
+        ]);
     }
 }

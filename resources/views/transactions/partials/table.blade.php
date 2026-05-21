@@ -68,18 +68,17 @@
                             {{-- Type --}}
                             <td class="px-6 md:px-8 py-5 whitespace-nowrap">
                                 <div class="flex items-center gap-3">
-
                                     <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-lg
-                                        {{ strtolower($transaction->type) == 'income'
+                                        {{ strtolower($transaction->type) == 'balance added' || strtolower($transaction->type) == 'wallet created'
                                             ? 'bg-emerald-100 text-emerald-600'
-                                            : (strtolower($transaction->type) == 'expense'
+                                            : (strtolower($transaction->type) == 'expense' || strtolower($transaction->type) == 'wallet deleted'
                                                 ? 'bg-red-100 text-red-600'
-                                                : 'bg-indigo-100 text-indigo-600') }}">
-
-                                        @if (strtolower($transaction->type) == 'income')
-                                            ⬇
-                                        @elseif (strtolower($transaction->type) == 'expense')
-                                            ⬆
+                                                : 'bg-indigo-100 text-indigo-600') }}"
+                                    >
+                                        @if (strtolower($transaction->type) == 'balance added' || strtolower($transaction->type) == 'wallet created')
+                                            ✚
+                                        @elseif (strtolower($transaction->type) == 'expense' || strtolower($transaction->type) == 'wallet deleted')
+                                            ⛔
                                         @else
                                             ⇄
                                         @endif
@@ -146,17 +145,18 @@
                 <div class="p-5 space-y-4 hover:bg-gray-50 transition-all duration-200">
                     <div class="flex items-start justify-between gap-4">
                         <div class="flex items-center gap-4">
-                            <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-xl
-                                {{ strtolower($transaction->type) == 'income'
-                                    ? 'bg-emerald-100 text-emerald-600'
-                                    : (strtolower($transaction->type) == 'expense'
-                                        ? 'bg-red-100 text-red-600'
-                                        : 'bg-indigo-100 text-indigo-600') }}">
 
-                                @if (strtolower($transaction->type) == 'income')
-                                    ⬇
-                                @elseif (strtolower($transaction->type) == 'expense')
-                                    ⬆
+                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-lg
+                                {{ strtolower($transaction->type) == 'balance added' || strtolower($transaction->type) == 'wallet created'
+                                    ? 'bg-emerald-100 text-emerald-600'
+                                    : (strtolower($transaction->type) == 'expense' || strtolower($transaction->type) == 'wallet deleted'
+                                        ? 'bg-red-100 text-red-600'
+                                        : 'bg-indigo-100 text-indigo-600') }}"
+                            >
+                                @if (strtolower($transaction->type) == 'balance added' || strtolower($transaction->type) == 'wallet created')
+                                    ✚
+                                @elseif (strtolower($transaction->type) == 'expense' || strtolower($transaction->type) == 'wallet deleted')
+                                    ⛔
                                 @else
                                     ⇄
                                 @endif
