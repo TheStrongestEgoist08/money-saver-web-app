@@ -59,8 +59,14 @@ Route::controller(GoalsController::class)->middleware(['auth', 'verified'])->pre
     Route::get('/goals', 'index')
         ->name('user.goals');
 
+    Route::get('/goals/filter', 'filter')
+        ->name('user.goals.filter');
+
     Route::post('goals/store', 'store')
         ->name('user.goals.store');
+
+    Route::post('/goals/add-money', 'addMoney')
+        ->name('user.goals.add-money');
 });
 
 # Report route

@@ -14,7 +14,7 @@ class TransactionController extends Controller
     {
         $transactions = Transaction::where('user_id', Auth::id())
             ->latest()
-            ->paginate(10);
+            ->paginate(20);
 
         # dd($transactions);
 
@@ -38,7 +38,7 @@ class TransactionController extends Controller
                 $query->where('type', $validated_data['type']);
             })
             ->latest()
-            ->paginate(10)
+            ->paginate(20)
             ->withQueryString();
 
         return view('transactions.index', [

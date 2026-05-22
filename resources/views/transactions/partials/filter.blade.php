@@ -40,13 +40,13 @@
         {{-- Actions --}}
         <div class="flex items-end gap-3">
             <button
-                type="clear"
-                class="flex-1 px-5 py-3 rounded-2xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all"
+                type="reset"
+                class="flex-1 px-5 py-3 rounded-2xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all active:scale-95"
             >Reset</button>
 
             <button
                 type="submit"
-                class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-2xl px-5 py-3 transition-all shadow-lg shadow-emerald-100"
+                class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-2xl px-5 py-3 transition-all shadow-lg shadow-emerald-100 active:scale-95"
             >Apply</button>
         </div>
     </form>
