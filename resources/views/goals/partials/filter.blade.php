@@ -27,7 +27,7 @@
                 Type
             </label>
 
-            <select name="type" class="w-full rounded-2xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 px-5 py-3">
+            <select name="status" class="w-full rounded-2xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 px-5 py-3">
                 <option value="">All Status</option>
 
                 <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>

@@ -36,8 +36,8 @@ class GoalsController extends Controller
         }
 
         // Type / Status Filter
-        if ($request->filled('type')) {
-            $query->where('status', $request->type);
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
         }
 
         $goals = $query->latest()

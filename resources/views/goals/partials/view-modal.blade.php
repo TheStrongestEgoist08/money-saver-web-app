@@ -3,8 +3,8 @@
 <div
     x-show="viewModal"
     x-transition.opacity
-    x-cloak
     class="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-6 capitalize"
+    x-cloak
 >
 
     {{-- Backdrop --}}
@@ -199,6 +199,5 @@
                 Close
             </button>
         </div>
-
     </div>
 </div>
