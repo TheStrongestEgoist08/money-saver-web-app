@@ -105,22 +105,25 @@
                         </td>
                         <td class="px-6 py-5 text-center">
                             <span class="inline-flex items-center px-4 py-1.5 rounded-2xl text-sm font-medium
-                                {{ $goal->status === 'Completed' ? 'bg-emerald-100 text-emerald-700' :
-                                  ($goal->status === 'Cancelled' ? 'bg-red-100 text-red-700' :
-                                  ($goal->status === 'Failed' ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700')) }}">
+                                {{ $goal->status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
+                                  ($goal->status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                                  ($goal->status === 'failed' ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700')) }}">
                                 {{ ucfirst($goal->status ?? 'Active') }}
                             </span>
                         </td>
                         <td class="px-6 py-5 text-right">
-                            <div class="flex items-center justify-end gap-2">
+                            <div class="flex items-center justify-center gap-2">
                                 <button @click='openViewModal(@json($goal))'
                                     class="px-5 py-2.5 rounded-2xl bg-gray-900 text-white text-sm font-medium hover:bg-black transition-all">
                                     View
                                 </button>
-                                <button @click='openAddMoneyModal(@json($goal))'
-                                    class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-500 text-white text-sm font-semibold hover:from-emerald-600 hover:to-green-600 transition-all">
-                                    Add
-                                </button>
+
+                                @if (!$goal->isCompleted())
+                                    <button @click='openAddMoneyModal(@json($goal))'
+                                        class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-500 text-white text-sm font-semibold hover:from-emerald-600 hover:to-green-600 transition-all">
+                                        Add
+                                    </button>
+                                @endif
                             </div>
                         </td>
                     </tr>
@@ -189,9 +192,9 @@
                 <!-- Status -->
                 <div>
                     <span class="inline-flex items-center px-4 py-1.5 rounded-2xl text-sm font-medium
-                        {{ $goal->status === 'Completed' ? 'bg-emerald-100 text-emerald-700' :
-                        ($goal->status === 'Cancelled' ? 'bg-red-100 text-red-700' :
-                        ($goal->status === 'Failed' ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700')) }}">
+                        {{ $goal->status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
+                        ($goal->status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                        ($goal->status === 'failed' ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700')) }}">
                         {{ ucfirst($goal->status ?? 'Active') }}
                     </span>
                 </div>
@@ -204,11 +207,13 @@
                         View
                     </button>
 
-                    <button
-                        @click='openAddMoneyModal(@json($goal))'
-                        class="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-500 text-white text-sm font-semibold hover:from-emerald-600 hover:to-green-600 transition-all active:scale-[0.97]">
-                        Add
-                    </button>
+                    @if (!$goal->isCompleted())
+                        <button
+                            @click='openAddMoneyModal(@json($goal))'
+                            class="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-500 text-white text-sm font-semibold hover:from-emerald-600 hover:to-green-600 transition-all active:scale-[0.97]">
+                            Add
+                        </button>
+                    @endif
                 </div>
 
             </div>

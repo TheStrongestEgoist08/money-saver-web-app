@@ -1,3 +1,4 @@
+
 {{-- Add Money Modal --}}
 <div
     x-show="addMoneyModal"
@@ -64,11 +65,21 @@
                         id="amount"
                         step="0.01"
                         min="1"
+                        :max="Number(selectedGoal?.target_amount) - Number(selectedGoal?.saved_amount)"
                         required
                         class="w-full pl-9 pr-4 py-4 text-2xl font-semibold border border-gray-200 rounded-2xl focus:border-emerald-500 focus:ring-emerald-500 outline-none"
                         placeholder="0.00"
+                        x-on:input="if (parseFloat(this.value) > (Number(selectedGoal?.target_amount) - Number(selectedGoal?.saved_amount))) {
+                            this.value = (Number(selectedGoal?.target_amount) - Number(selectedGoal?.saved_amount)).toFixed(2);
+                        }"
                     >
                 </div>
+                <p class="text-xs text-gray-500 mt-1.5">
+                    Maximum allowed:
+                    <span class="font-medium text-emerald-600"
+                          x-text="`₱${(Number(selectedGoal?.target_amount) - Number(selectedGoal?.saved_amount)).toLocaleString('en-PH', {minimumFractionDigits: 2})}`">
+                    </span>
+                </p>
             </div>
 
             <!-- Remaining -->
