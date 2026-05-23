@@ -22,22 +22,35 @@ class AISuggestionService
             return ['success' => false, 'message' => 'Message is required.'];
         }
 
-        // === Detect Period from User's Message ===
-        $detectedPeriod = $this->detectPeriodFromMessage($userMessage, $requestedPeriod);
-        $dateRange = $this->getDateRange($detectedPeriod);
-        $start = $dateRange['start'];
-        $end = $dateRange['end'];
+        // === Enhanced Period Detection ===
+        $periodInfo = $this->detectPeriodFromMessage($userMessage, $requestedPeriod);
+        $dateRanges = $this->getDateRanges($periodInfo);
 
-        // Fetch expenses for the detected period
-        $expenses = Expense::where('user_id', $user->id)
-            ->whereBetween('created_at', [$start, $end])
-            ->get();
+        // Fetch expenses for all relevant periods
+        $allExpenses = collect();
+        $periodSummaries = [];
 
-        $totalSpent = $expenses->sum('total') ?? 0;
+        foreach ($dateRanges as $key => $range) {
+            $expenses = Expense::where('user_id', $user->id)
+                ->whereBetween('created_at', [$range['start'], $range['end']])
+                ->get();
 
-        $summary = $expenses->groupBy('type')
-            ->map(fn($group) => round($group->sum('total'), 2))
-            ->toArray();
+            $total = $expenses->sum('total') ?? 0;
+
+            $summary = $expenses->groupBy('type')
+                ->map(fn($group) => round($group->sum('total'), 2))
+                ->toArray();
+
+            $periodSummaries[$key] = [
+                'period' => $range['label'],
+                'total' => $total,
+                'summary' => $summary,
+                'start' => $range['start'],
+                'end' => $range['end']
+            ];
+
+            $allExpenses = $allExpenses->merge($expenses);
+        }
 
         // Get or create conversation
         $conversation = $conversationId
@@ -48,7 +61,7 @@ class AISuggestionService
             $conversation = Conversation::create([
                 'user_id' => $user->id,
                 'title'   => 'New Chat',
-                'period'  => $detectedPeriod,
+                'period'  => $periodInfo['main_period'],
                 'messages' => []
             ]);
         }
@@ -57,17 +70,21 @@ class AISuggestionService
 
         // === Build Smart Prompt ===
         $prompt = "You are Luna, a friendly, warm, and intelligent personal finance advisor.\n\n";
+        $prompt .= "User: {$user->name}\n\n";
 
-        $prompt .= "User: {$user->name}\n";
-        $prompt .= "Current Period Analyzed: {$detectedPeriod} ({$start->format('M d, Y')} - {$end->format('M d, Y')})\n";
-        $prompt .= "Total spent in this period: ₱" . number_format($totalSpent, 2) . "\n";
-        $prompt .= "Spending by category: " . json_encode($summary, JSON_PRETTY_PRINT) . "\n\n";
+        $prompt .= "I have analyzed the following periods for you:\n\n";
+
+        foreach ($periodSummaries as $info) {
+            $prompt .= "📅 {$info['period']} ({$info['start']->format('M d, Y')} - {$info['end']->format('M d, Y')})\n";
+            $prompt .= "Total Spent: ₱" . number_format($info['total'], 2) . "\n";
+            $prompt .= "By Category: " . json_encode($info['summary'], JSON_PRETTY_PRINT) . "\n\n";
+        }
 
         $prompt .= "Rules:\n";
-        $prompt .= "- Always base your answer on the data provided above.\n";
-        $prompt .= "- If the user asks about a different period, acknowledge it and tell them you're showing data for the detected period.\n";
-        $prompt .= "- Be helpful, conversational, and honest.\n";
-        $prompt .= "- Do not make up expense numbers.\n\n";
+        $prompt .= "- Always base your answers strictly on the data provided above.\n";
+        $prompt .= "- Be conversational, warm, and honest.\n";
+        $prompt .= "- If user asks for a period not shown, tell them honestly and offer to analyze it.\n";
+        $prompt .= "- You can compare periods when relevant.\n\n";
 
         $prompt .= "Previous conversation:\n";
         foreach ($messages as $msg) {
@@ -76,7 +93,7 @@ class AISuggestionService
         }
 
         $prompt .= "User: {$userMessage}\n\n";
-        $prompt .= "Respond naturally and helpfully.";
+        $prompt .= "Respond naturally and helpfully as Luna.";
 
         try {
             $response = Prism::text()
@@ -86,23 +103,23 @@ class AISuggestionService
                 ->usingTemperature(0.75)
                 ->generate();
 
-            $aiReply = $response->text ?? "Hey! How can I help you with your expenses?";
+            $aiReply = $response->text ?? "Hey! I'd love to help you with your expenses.";
 
-            // Save to conversation history
+            // Save conversation
             $messages[] = ['role' => 'user', 'content' => $userMessage];
             $messages[] = ['role' => 'assistant', 'content' => $aiReply];
 
             $conversation->update([
                 'messages' => $messages,
-                'title'    => $conversation->title ?: substr($userMessage, 0, 45) . '...',
-                'period'   => $detectedPeriod
+                'title'    => $conversation->title ?: substr($userMessage, 0, 50) . '...',
+                'period'   => $periodInfo['main_period']
             ]);
 
             return [
                 'success'        => true,
                 'response'       => $aiReply,
                 'conversation_id'=> $conversation->id,
-                'period'         => $detectedPeriod
+                'period'         => $periodInfo['main_period']
             ];
 
         } catch (\Exception $e) {
@@ -112,81 +129,138 @@ class AISuggestionService
     }
 
     /**
-     * Detect period from user's natural language message
+     * Enhanced Period Detection
      */
-    private function detectPeriodFromMessage(string $message, string $defaultPeriod): string
+    private function detectPeriodFromMessage(string $message, string $defaultPeriod): array
     {
-        $message = strtolower($message);
+        $message = strtolower(trim($message));
 
-        // Specific months
-        if (preg_match('/january|jan|february|feb|march|mar|april|apr|may|june|jun|july|jul|august|aug|september|sep|october|oct|november|nov|december|dec/', $message)) {
-            return 'month'; // We'll handle specific month later if needed
+        $mainPeriod = $defaultPeriod;
+
+        // Specific month names
+        $months = [
+            'january' => 1, 'jan' => 1,
+            'february' => 2, 'feb' => 2,
+            'march' => 3, 'mar' => 3,
+            'april' => 4, 'apr' => 4,
+            'may' => 5,
+            'june' => 6, 'jun' => 6,
+            'july' => 7, 'jul' => 7,
+            'august' => 8, 'aug' => 8,
+            'september' => 9, 'sep' => 9,
+            'october' => 10, 'oct' => 10,
+            'november' => 11, 'nov' => 11,
+            'december' => 12, 'dec' => 12,
+        ];
+
+        foreach ($months as $name => $num) {
+            if (str_contains($message, $name)) {
+                return [
+                    'main_period' => 'specific_month',
+                    'month' => $num,
+                    'year' => now()->year
+                ];
+            }
         }
 
+        // Last month + month name (e.g., "last march")
+        if (preg_match('/last\s+([a-z]+)/', $message, $matches)) {
+            $monthName = $matches[1];
+            foreach ($months as $name => $num) {
+                if ($monthName === $name) {
+                    return [
+                        'main_period' => 'specific_month',
+                        'month' => $num,
+                        'year' => now()->year - (now()->month < $num ? 1 : 0)
+                    ];
+                }
+            }
+        }
+
+        // This / Last / Previous
         if (str_contains($message, 'last month') || str_contains($message, 'previous month')) {
-            return 'last_month';
+            return ['main_period' => 'last_month'];
         }
         if (str_contains($message, 'this month') || str_contains($message, 'current month')) {
-            return 'month';
+            return ['main_period' => 'month'];
         }
         if (str_contains($message, 'last week') || str_contains($message, 'previous week')) {
-            return 'last_week';
+            return ['main_period' => 'last_week'];
         }
-        if (str_contains($message, 'this week') || str_contains($message, 'current week')) {
-            return 'week';
+        if (str_contains($message, 'this week')) {
+            return ['main_period' => 'week'];
         }
-        if (str_contains($message, 'last year') || str_contains($message, 'previous year')) {
-            return 'last_year';
+        if (str_contains($message, 'last year')) {
+            return ['main_period' => 'last_year'];
         }
-        if (str_contains($message, 'this year') || str_contains($message, 'current year')) {
-            return 'year';
-        }
-        if (str_contains($message, 'past 3 months') || str_contains($message, 'last 3 months')) {
-            return '3months';
+        if (str_contains($message, 'this year')) {
+            return ['main_period' => 'year'];
         }
 
-        // Default fallback
-        return $defaultPeriod;
+        return ['main_period' => $defaultPeriod];
     }
 
     /**
-     * Updated getDateRange with more options
+     * Get one or more date ranges based on detected period
      */
-    private function getDateRange(string $period): array
+    private function getDateRanges(array $periodInfo): array
     {
-        return match ($period) {
-            'week' => [
-                'start' => now()->startOfWeek(),
-                'end'   => now()->endOfWeek()
-            ],
-            'last_week' => [
-                'start' => now()->subWeek()->startOfWeek(),
-                'end'   => now()->subWeek()->endOfWeek()
-            ],
-            'month' => [
-                'start' => now()->startOfMonth(),
-                'end'   => now()->endOfMonth()
-            ],
-            'last_month' => [
-                'start' => now()->subMonth()->startOfMonth(),
-                'end'   => now()->subMonth()->endOfMonth()
-            ],
-            '3months' => [
-                'start' => now()->subMonths(3)->startOfMonth(),
-                'end'   => now()->endOfMonth()
-            ],
-            'year' => [
-                'start' => now()->startOfYear(),
-                'end'   => now()->endOfYear()
-            ],
-            'last_year' => [
-                'start' => now()->subYear()->startOfYear(),
-                'end'   => now()->subYear()->endOfYear()
-            ],
-            default => [
-                'start' => now()->startOfMonth(),
-                'end'   => now()->endOfMonth()
-            ]
+        $now = now();
+
+        return match ($periodInfo['main_period']) {
+            'specific_month' => [[
+                'start' => Carbon::create($periodInfo['year'], $periodInfo['month'], 1)->startOfMonth(),
+                'end'   => Carbon::create($periodInfo['year'], $periodInfo['month'], 1)->endOfMonth(),
+                'label' => Carbon::create($periodInfo['year'], $periodInfo['month'], 1)->format('F Y')
+            ]],
+
+            'week' => [[
+                'start' => $now->startOfWeek(),
+                'end'   => $now->endOfWeek(),
+                'label' => 'This Week'
+            ]],
+
+            'last_week' => [[
+                'start' => $now->subWeek()->startOfWeek(),
+                'end'   => $now->subWeek()->endOfWeek(),
+                'label' => 'Last Week'
+            ]],
+
+            'month' => [[
+                'start' => $now->startOfMonth(),
+                'end'   => $now->endOfMonth(),
+                'label' => 'This Month'
+            ]],
+
+            'last_month' => [[
+                'start' => $now->subMonth()->startOfMonth(),
+                'end'   => $now->subMonth()->endOfMonth(),
+                'label' => 'Last Month'
+            ]],
+
+            '3months' => [[
+                'start' => $now->subMonths(3)->startOfMonth(),
+                'end'   => $now->endOfMonth(),
+                'label' => 'Last 3 Months'
+            ]],
+
+            'year' => [[
+                'start' => $now->startOfYear(),
+                'end'   => $now->endOfYear(),
+                'label' => 'This Year'
+            ]],
+
+            'last_year' => [[
+                'start' => $now->subYear()->startOfYear(),
+                'end'   => $now->subYear()->endOfYear(),
+                'label' => 'Last Year'
+            ]],
+
+            default => [[
+                'start' => $now->startOfMonth(),
+                'end'   => $now->endOfMonth(),
+                'label' => 'This Month'
+            ]]
         };
     }
 }

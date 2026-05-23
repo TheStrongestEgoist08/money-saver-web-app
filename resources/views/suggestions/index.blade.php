@@ -65,9 +65,10 @@
                                class="w-full bg-gray-100 border border-gray-300 focus:border-indigo-500 focus:ring-0 rounded-3xl py-4 pl-6 pr-14 text-gray-800 placeholder-gray-500 focus:bg-white transition-all"
                                placeholder="Ask about your expenses, budget, savings...">
 
-                        <button onclick="sendMessage()"
-                                class="absolute right-2 top-1/2 -translate-y-1/2 bg-indigo-600 hover:bg-indigo-700 text-white w-10 h-10 rounded-2xl flex items-center justify-center transition-all active:scale-95">
-                            <i class="fas fa-paper-plane"></i>
+                        <button onclick="sendMessage()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-indigo-600 hover:bg-indigo-700 text-white w-10 h-10 rounded-2xl flex items-center justify-center transition-all active:scale-95">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-square-fill" viewBox="0 0 16 16">
+                                    <path d="M0 14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2zm4.5-6.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5a.5.5 0 0 1 0-1"/>
+                                </svg>
                         </button>
                     </div>
                 </div>
