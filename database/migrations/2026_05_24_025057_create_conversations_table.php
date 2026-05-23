@@ -11,16 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ai_suggestions', function (Blueprint $table) {
+        Schema::create('conversations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->text('prompt');
-            $table->longText('suggestions');
-            $table->string('period')->nullable();
-            $table->json('metadata')->nullable();
+            $table->string('title')->nullable();
+            $table->json('messages')->nullable();
+            $table->string('period')->default('month');
             $table->timestamps();
-
-            $table->index(['user_id', 'created_at']);
         });
     }
 
@@ -29,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ai_suggestions');
+        Schema::dropIfExists('conversations');
     }
 };

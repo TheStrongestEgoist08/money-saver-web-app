@@ -2,99 +2,102 @@
 
 namespace App\Services;
 
+use App\Models\Conversation;
 use App\Models\Expense;
 use Illuminate\Support\Facades\Auth;
 use Prism\Prism\Facades\Prism;
-
 use Illuminate\Support\Facades\Log;
 
 class AISuggestionService
 {
-    public function getSuggestions(string $period = 'month')
+    public function getSuggestions(array $data)
     {
         $user = Auth::user();
+        $conversationId = $data['conversation_id'] ?? null;
+        $message = $data['message'] ?? null;
+        $period = $data['period'] ?? 'month';
 
-        $query = Expense::where('user_id', $user->id);
-
-        if ($period === 'month') {
-            $start = now()->startOfMonth();
-            $end = now()->endOfMonth();
-        } elseif ($period === 'week') {
-            $start = now()->startOfWeek();
-            $end = now()->endOfWeek();
-        } else {
-            $start = now()->subMonths(3);
-            $end = now();
+        if (!$message) {
+            return ['success' => false, 'message' => 'Message is required.'];
         }
 
-        $expenses = $query->whereBetween('created_at', [$start, $end])->get();
+        // Get or create conversation
+        $conversation = $conversationId
+            ? Conversation::where('user_id', $user->id)->find($conversationId)
+            : null;
 
-        if ($expenses->isEmpty()) {
-            return [
-                'success'     => true,
-                'period'      => ucfirst($period),
-                'suggestions' => "You haven't added any expenses yet. Start tracking to get AI suggestions! 💡"
-            ];
+        if (!$conversation) {
+            $conversation = Conversation::create([
+                'user_id' => $user->id,
+                'title'   => 'New Chat',
+                'period'  => $period,
+                'messages' => []
+            ]);
         }
+
+        $messages = $conversation->messages ?? [];
+
+        // Get recent expenses for context
+        $expenses = Expense::where('user_id', $user->id)
+            ->whereBetween('created_at', [now()->subMonths(3), now()])
+            ->get();
 
         $totalSpent = $expenses->sum('total') ?? 0;
-
         $summary = $expenses->groupBy('type')
-            ->map(fn($items) => [
-                'total_spent' => round($items->sum('total') ?? 0, 2),
-                'count'       => $items->count(),
-                'avg_per_item'=> round($items->avg('total') ?? 0, 2),
-            ]);
+            ->map(fn($group) => round($group->sum('total'), 2))
+            ->toArray();
 
-        $topExpenses = $expenses->sortByDesc(fn($exp) => $exp->total ?? 0)->take(5);
+        // Improved Natural Prompt
+        $prompt = "You are Luna, a friendly, warm, and witty personal finance advisor. You talk like a smart and helpful friend.\n\n";
 
-        $prompt = "You are an expert personal finance advisor.\n\n";
         $prompt .= "User: {$user->name}\n";
-        $prompt .= "Period: {$period} ({$start->format('Y-m-d')} to {$end->format('Y-m-d')})\n\n";
-        $prompt .= "Total spent: ₱" . number_format($totalSpent, 2) . "\n\n";
-        $prompt .= "Expense Breakdown:\n" . json_encode($summary, JSON_PRETTY_PRINT) . "\n\n";
-        $prompt .= "Top 5 highest expenses:\n";
+        $prompt .= "Total spent in last 3 months: ₱" . number_format($totalSpent, 2) . "\n";
+        $prompt .= "Category spending: " . json_encode($summary) . "\n\n";
 
-        foreach ($topExpenses as $exp) {
-            $amount = number_format($exp->total ?? 0, 2);
-            $prompt .= "- {$exp->expense_name} ({$exp->type}): ₱{$amount}\n";
+        $prompt .= "Rules:\n";
+        $prompt .= "- If the user says hi, hello, or just greets you, respond naturally and friendly. Do NOT give financial advice immediately.\n";
+        $prompt .= "- Only give finance advice when the user asks for it.\n";
+        $prompt .= "- Be conversational, concise, and natural.\n";
+        $prompt .= "- Never say you are an AI unless asked.\n\n";
+
+        $prompt .= "Previous conversation:\n";
+
+        foreach ($messages as $msg) {
+            $role = $msg['role'] === 'user' ? 'User' : 'Luna';
+            $prompt .= "{$role}: {$msg['content']}\n\n";
         }
 
-        $prompt .= "\nGive 5 practical, actionable suggestions to help this user save money.";
+        $prompt .= "User: {$message}\n\n";
+        $prompt .= "Respond in a natural, friendly way.";
 
         try {
-            Log::info('AI Suggestion: Starting request', [
-                'user_id' => $user->id,
-                'period' => $period,
-                'total_spent' => $totalSpent,
-            ]);
-
             $response = Prism::text()
                 ->using('gemini', 'gemini-2.5-flash')
                 ->withPrompt($prompt)
                 ->withMaxTokens(4096)
+                ->usingTemperature(0.8)        // ← Fixed here
                 ->generate();
 
-            Log::info('AI Suggestion: Raw response received', [
-                'text_preview' => substr($response->text ?? '', 0, 500),
+            $aiReply = $response->text ?? "Hey! How's it going?";
+
+            // Save to history
+            $messages[] = ['role' => 'user', 'content' => $message];
+            $messages[] = ['role' => 'assistant', 'content' => $aiReply];
+
+            $conversation->update([
+                'messages' => $messages,
+                'title' => $conversation->title ?: substr($message, 0, 50) . '...'
             ]);
 
-            # dd($response);
-
             return [
-                'success'     => true,
-                'period'      => ucfirst($period),
-                'suggestions' => $response->text ?? 'No response from AI.',
+                'success' => true,
+                'response' => $aiReply,
+                'conversation_id' => $conversation->id
             ];
 
         } catch (\Exception $e) {
-            Log::error('AI Suggestion Error: ' . $e->getMessage());
-
-            return [
-                'success'     => false,
-                'message'     => 'AI service is temporarily unavailable. Please try again later.',
-                'error'       => config('app.debug') ? $e->getMessage() : null,
-            ];
+            Log::error('AI Error: ' . $e->getMessage());
+            return ['success' => false, 'message' => 'Sorry, I had trouble responding. Try again.'];
         }
     }
 }

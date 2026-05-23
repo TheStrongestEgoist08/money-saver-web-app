@@ -86,8 +86,17 @@ Route::controller(SuggestionController::class)->middleware(['auth', 'verified'])
     Route::get('/suggestions', 'index')
         ->name('user.suggestions');
 
-    Route::get('/suggestions/ai', 'aiSuggestions')
+    Route::get('/suggestions/conversations', 'getConversations')
+        ->name('user.suggestions.conversations');
+
+    Route::get('/suggestions/conversations/{id}', 'showConversation')
+        ->name('user.suggestions.conversation.show');
+
+    Route::post('/suggestions/get', 'getSuggestions')
         ->name('user.suggestions.ai');
+
+    Route::delete('/suggestions/conversations/{id}', 'deleteConversation')
+        ->name('user.suggestions.conversation.delete');
 });
 
 # Transaction route

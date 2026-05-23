@@ -1,4 +1,5 @@
 
+{{-- AI Expense Advisor Page --}}
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-2xl md:text-3xl text-gray-800 tracking-tight">
@@ -6,178 +7,199 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-2xl border border-gray-100">
-                <!-- Header Section -->
-                <div class="flex justify-between items-center px-8 py-6 border-b border-gray-100">
-                    <div>
-                        <h3 class="text-2xl font-semibold text-gray-800">
-                            Get Smart AI Suggestions
-                        </h3>
-                        <p class="text-gray-500 mt-1">
-                            Let AI analyze your expenses and give personalized advice
-                        </p>
-                    </div>
+    <div class="flex h-[calc(100vh-4rem)] overflow-hidden">
+        <!-- Sidebar -->
+        <div class="w-80 border-r border-gray-200 bg-gray-50 flex flex-col">
+            <div class="p-4 border-b bg-white">
+                <button onclick="newChat()"
+                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-2xl flex items-center justify-center gap-2 font-medium transition-all">
+                    <i class="fas fa-plus"></i> New Chat
+                </button>
+            </div>
 
-                    <!-- Flashing Button -->
-                    <button id="ai-btn" class="btn bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl flex items-center gap-3 font-medium transition-all duration-200 shadow-md hover:shadow-lg animate-pulse">
-                        <i class="fas fa-magic"></i>
-                        Get AI Suggestions
+            <div class="flex-1 overflow-y-auto px-3 py-2" id="chat-list">
+                <!-- Chat list populated by JS -->
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="flex-1 flex flex-col">
+            <!-- Header -->
+            <div class="p-5 border-b border-gray-200 bg-white flex items-center justify-between">
+                <div>
+                    <h3 class="font-semibold text-gray-800" id="chat-title">New Conversation</h3>
+                    <p class="text-sm text-gray-500" id="chat-subtitle">Luna • Personal Finance Advisor</p>
+                </div>
+                <button onclick="deleteCurrentChat()"
+                        class="text-red-500 hover:text-red-600 p-2 rounded-xl hover:bg-red-50 transition-all">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+
+            <!-- Messages Area -->
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50">
+                <!-- Messages appear here -->
+            </div>
+
+            <!-- Input Area -->
+            <div class="p-6 border-t border-gray-200 bg-white">
+                <div class="flex gap-3">
+                    <input id="user-message"
+                           type="text"
+                           class="flex-1 border border-gray-300 rounded-3xl px-6 py-4 focus:outline-none focus:border-indigo-500 focus:ring-1"
+                           placeholder="Ask anything about your expenses, savings, or budget...">
+                    <button onclick="sendMessage()"
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 rounded-3xl transition-all">
+                        <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>
-
-                <!-- Loading Banner -->
-                <div id="ai-loading" class="d-none text-center py-16 bg-indigo-50 border-b border-indigo-100">
-                    <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 rounded-2xl mb-6">
-                        <div class="spinner-border text-indigo-600 w-8 h-8" role="status"></div>
-                    </div>
-                    <p class="text-indigo-700 font-semibold text-lg">
-                        AI is analyzing your expenses...
-                    </p>
-                    <p class="text-gray-500 text-sm mt-1">This may take a few seconds</p>
-                </div>
-
-                <!-- Result -->
-                <div id="ai-result" class="p-8"></div>
-
             </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        let currentConversationId = null;
 
-            const aiBtn = document.getElementById('ai-btn');
-            const loading = document.getElementById('ai-loading');
-            const resultDiv = document.getElementById('ai-result');
+        // Load all conversations
+        async function loadConversations() {
+            try {
+                const response = await fetch("{{ route('user.suggestions.conversations') }}");
+                if (!response.ok) throw new Error('Failed to load chats');
 
-            const aiUrl = "{{ route('user.suggestions.ai') }}";
+                const data = await response.json();
+                const container = document.getElementById('chat-list');
+                container.innerHTML = '';
 
-            aiBtn.addEventListener('click', getAISuggestions);
-
-            async function getAISuggestions() {
-                console.clear();
-
-                // Disable button and show "AI is analyzing"
-                aiBtn.disabled = true;
-                aiBtn.classList.remove('animate-pulse');
-                aiBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> AI is analyzing...`;
-
-                // Show loading
-                loading.classList.remove('d-none');
-                resultDiv.innerHTML = '';
-
-                try {
-                    const response = await fetch(aiUrl, {
-                        method: 'GET',
-                        credentials: 'same-origin',
-                        headers: { 'Accept': 'application/json' }
-                    });
-
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-                    const data = await response.json();
-
-                    if (data.success === true && data.suggestions) {
-
-                        resultDiv.innerHTML = `
-                            <div class="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
-                                <div class="px-8 py-5 bg-gradient-to-r from-indigo-50 to-white border-b border-gray-100 flex items-center gap-3">
-                                    <div class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center">
-                                        <i class="fas fa-lightbulb"></i>
-                                    </div>
-                                    <div>
-                                        <strong class="text-gray-800">AI Suggestions</strong>
-                                        <span class="text-gray-400 text-sm ml-2">• ${data.period || 'Current Period'}</span>
-                                    </div>
-                                </div>
-                                <div class="p-8">
-                                    <div id="typed-text" class="leading-relaxed text-gray-700 text-[17px] min-h-[100px]">
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-
-                        // Typing Animation with **bold** support
-                        const typedContainer = document.getElementById('typed-text');
-                        const fullText = data.suggestions;
-                        let index = 0;
-                        const speed = 2; // typing speed (lower = faster)
-
-                        function typeWriter() {
-                            if (index < fullText.length) {
-                                let chunk = '';
-
-                                // Handle **bold** text
-                                if (fullText.substring(index, index + 2) === '**') {
-                                    const closingIndex = fullText.indexOf('**', index + 2);
-
-                                    if (closingIndex !== -1) {
-                                        const boldText = fullText.substring(index + 2, closingIndex);
-                                        chunk = `<strong class="font-semibold text-gray-800">${boldText}</strong>`;
-                                        index = closingIndex + 2; // skip past closing **
-                                    } else {
-                                        chunk = fullText.charAt(index);
-                                        index++;
-                                    }
-                                }
-                                // Handle new lines
-                                else if (fullText.charAt(index) === '\n') {
-                                    chunk = '<br><br>';
-                                    index++;
-                                }
-                                // Normal character
-                                else {
-                                    chunk = fullText.charAt(index);
-                                    index++;
-                                }
-
-                                typedContainer.innerHTML += chunk;
-                                setTimeout(typeWriter, speed);
-                            }
-                        }
-
-                        // Start typing
-                        setTimeout(typeWriter, 300);
-
-                    } else {
-                        // No suggestions case
-                        resultDiv.innerHTML = `
-                            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6">
-                                <div class="flex gap-3">
-                                    <i class="fas fa-exclamation-triangle text-amber-500 text-xl mt-0.5"></i>
-                                    <div>
-                                        <strong class="text-amber-700">No suggestions available</strong>
-                                        <p class="text-amber-600 mt-1">${data.message || 'Please try again later.'}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    }
-
-                } catch (error) {
-                    console.error('Error:', error);
-                    resultDiv.innerHTML = `
-                        <div class="bg-red-50 border border-red-200 rounded-2xl p-6">
-                            <div class="flex gap-3">
-                                <i class="fas fa-circle-xmark text-red-500 text-xl mt-0.5"></i>
-                                <div>
-                                    <strong class="text-red-700">Request Failed</strong>
-                                    <p class="text-red-600 mt-1">${error.message}</p>
-                                </div>
-                            </div>
+                data.forEach(chat => {
+                    const isActive = chat.id === currentConversationId ? 'bg-white shadow-sm border border-indigo-200' : 'hover:bg-white';
+                    container.innerHTML += `
+                        <div onclick="openChat(${chat.id})"
+                             class="p-4 mx-2 my-1 rounded-2xl cursor-pointer transition-all ${isActive}">
+                            <div class="font-medium text-gray-800 line-clamp-1">${chat.title}</div>
+                            <div class="text-xs text-gray-500 mt-1">${new Date(chat.updated_at).toLocaleDateString()}</div>
                         </div>
                     `;
-                } finally {
-                    // Reset UI
-                    loading.classList.add('d-none');
-
-                    aiBtn.disabled = false;
-                    aiBtn.innerHTML = `<i class="fas fa-magic"></i> Get AI Suggestions`;
-                    aiBtn.classList.add('animate-pulse');
-                }
+                });
+            } catch (e) {
+                console.error("Load conversations failed:", e);
             }
+        }
+
+        // Start new chat
+        function newChat() {
+            currentConversationId = null;
+            document.getElementById('chat-title').textContent = 'New Conversation';
+            document.getElementById('chat-messages').innerHTML = '';
+            loadConversations();
+        }
+
+        // Open existing chat
+        async function openChat(id) {
+            currentConversationId = id;
+
+            try {
+                const res = await fetch(`{{ url('/user/suggestions/conversations') }}/${id}`);
+                const data = await res.json();
+
+                document.getElementById('chat-title').textContent = data.title;
+
+                const messagesDiv = document.getElementById('chat-messages');
+                messagesDiv.innerHTML = '';
+
+                data.messages.forEach(msg => {
+                    addMessage(msg.role, msg.content);
+                });
+
+                loadConversations();
+            } catch (e) {
+                console.error("Failed to open chat:", e);
+            }
+        }
+
+        // Add message to UI
+        function addMessage(role, content) {
+            const container = document.getElementById('chat-messages');
+            const isUser = role === 'user';
+
+            container.innerHTML += `
+                <div class="flex ${isUser ? 'justify-end' : 'justify-start'}">
+                    <div class="${isUser ? 'bg-indigo-600 text-white' : 'bg-white border border-gray-200'}
+                        rounded-3xl px-5 py-4 max-w-[75%] leading-relaxed">
+                        ${content.replace(/\n/g, '<br>')}
+                    </div>
+                </div>
+            `;
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Send message
+        async function sendMessage() {
+            const input = document.getElementById('user-message');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addMessage('user', message);
+            input.value = '';
+
+            const payload = {
+                message: message,
+                conversation_id: currentConversationId,
+                period: 'month'
+            };
+
+            try {
+                const response = await fetch("{{ route('user.suggestions.ai') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    addMessage('assistant', data.response);
+                    if (data.conversation_id) {
+                        currentConversationId = data.conversation_id;
+                    }
+                    loadConversations();
+                } else {
+                    addMessage('assistant', `<span class="text-red-600">${data.message || 'Something went wrong'}</span>`);
+                }
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                addMessage('assistant', `<span class="text-red-600">Connection failed. Please check your internet and try again.</span>`);
+            }
+        }
+
+        // Delete current chat
+        async function deleteCurrentChat() {
+            if (!currentConversationId || !confirm('Delete this conversation permanently?')) return;
+
+            try {
+                await fetch(`{{ url('/user/suggestions/conversations') }}/${currentConversationId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+                newChat();
+            } catch (e) {
+                alert("Failed to delete conversation");
+            }
+        }
+
+        // Enter key support
+        document.getElementById('user-message').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
         });
+
+        // Initialize on page load
+        window.onload = function() {
+            loadConversations();
+        };
     </script>
 </x-app-layout>
