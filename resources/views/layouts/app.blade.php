@@ -16,7 +16,10 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <!-- <x-ad-banner /> -->
+
+        @if (Auth::user()->is_premium == false)
+            <x-ad-banner />
+        @endif
 
         <div class="min-h-screen bg-gray-100">
             @include('layouts.navigation')

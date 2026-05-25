@@ -15,41 +15,53 @@ class AISuggestionService
     {
         $user = Auth::user();
         $conversationId = $data['conversation_id'] ?? null;
-        $userMessage = $data['message'] ?? null;
+        $userMessage = trim($data['message'] ?? '');
         $requestedPeriod = $data['period'] ?? 'month';
 
-        if (!$userMessage) {
+        if (empty($userMessage)) {
             return ['success' => false, 'message' => 'Message is required.'];
         }
 
-        // === Enhanced Period Detection ===
         $periodInfo = $this->detectPeriodFromMessage($userMessage, $requestedPeriod);
         $dateRanges = $this->getDateRanges($periodInfo);
 
-        // Fetch expenses for all relevant periods
-        $allExpenses = collect();
         $periodSummaries = [];
 
         foreach ($dateRanges as $key => $range) {
             $expenses = Expense::where('user_id', $user->id)
-                ->whereBetween('created_at', [$range['start'], $range['end']])
+                ->where('created_at', '>=', $range['start'])
+                ->where('created_at', '<=', $range['end'])
+                ->orderBy('created_at', 'desc')           // Most recent first
                 ->get();
 
+            // === Summary Data ===
             $total = $expenses->sum('total') ?? 0;
 
             $summary = $expenses->groupBy('type')
                 ->map(fn($group) => round($group->sum('total'), 2))
                 ->toArray();
 
-            $periodSummaries[$key] = [
-                'period' => $range['label'],
-                'total' => $total,
-                'summary' => $summary,
-                'start' => $range['start'],
-                'end' => $range['end']
-            ];
+            // === Detailed Expenses (New) ===
+            $details = $expenses->map(function ($expense) {
+                return [
+                    'id'          => $expense->id,
+                    'name'        => $expense->expense_name ?? $expense->description ?? 'Untitled Expense',
+                    'amount'      => round($expense->total, 2),
+                    'type'        => $expense->type,
+                    'date'        => $expense->created_at->format('M d, Y'),
+                    'time'        => $expense->created_at->format('h:i A'),
+                ];
+            })->toArray();
 
-            $allExpenses = $allExpenses->merge($expenses);
+            $periodSummaries[$key] = [
+                'period'  => $range['label'],
+                'total'   => $total,
+                'summary' => $summary,
+                'details' => $details,
+                'start'   => $range['start'],
+                'end'     => $range['end'],
+                'count'   => $expenses->count()
+            ];
         }
 
         // Get or create conversation
@@ -60,7 +72,7 @@ class AISuggestionService
         if (!$conversation) {
             $conversation = Conversation::create([
                 'user_id' => $user->id,
-                'title'   => 'New Chat',
+                'title'   => $this->generateConversationTitle($userMessage, $periodInfo),
                 'period'  => $periodInfo['main_period'],
                 'messages' => []
             ]);
@@ -68,23 +80,35 @@ class AISuggestionService
 
         $messages = $conversation->messages ?? [];
 
-        // === Build Smart Prompt ===
+        // Build Prompt (Now includes details)
         $prompt = "You are Luna, a friendly, warm, and intelligent personal finance advisor.\n\n";
-        $prompt .= "User: {$user->name}\n\n";
+        $prompt .= "User: {$user->name}\n";
+        $prompt .= "Current Date: " . now()->format('F d, Y') . "\n\n";
 
-        $prompt .= "I have analyzed the following periods for you:\n\n";
+        $prompt .= "Here is the financial data I analyzed:\n\n";
 
         foreach ($periodSummaries as $info) {
             $prompt .= "📅 {$info['period']} ({$info['start']->format('M d, Y')} - {$info['end']->format('M d, Y')})\n";
             $prompt .= "Total Spent: ₱" . number_format($info['total'], 2) . "\n";
+            $prompt .= "Number of transactions: {$info['count']}\n";
             $prompt .= "By Category: " . json_encode($info['summary'], JSON_PRETTY_PRINT) . "\n\n";
+
+            // === Add Expense Details ===
+            if (!empty($info['details'])) {
+                $prompt .= "📋 Individual Expenses:\n";
+                foreach ($info['details'] as $expense) {
+                    $prompt .= "- {$expense['date']} {$expense['time']} | {$expense['name']} | ₱" .
+                              number_format($expense['amount'], 2) . " | {$expense['type']}\n";
+                }
+                $prompt .= "\n";
+            }
         }
 
         $prompt .= "Rules:\n";
         $prompt .= "- Always base your answers strictly on the data provided above.\n";
-        $prompt .= "- Be conversational, warm, and honest.\n";
-        $prompt .= "- If user asks for a period not shown, tell them honestly and offer to analyze it.\n";
-        $prompt .= "- You can compare periods when relevant.\n\n";
+        $prompt .= "- You can now refer to specific expenses by name and date.\n";
+        $prompt .= "- Be honest if data is partial or for a single day.\n";
+        $prompt .= "- Be conversational, warm, and helpful.\n\n";
 
         $prompt .= "Previous conversation:\n";
         foreach ($messages as $msg) {
@@ -93,27 +117,22 @@ class AISuggestionService
         }
 
         $prompt .= "User: {$userMessage}\n\n";
-        $prompt .= "Respond naturally and helpfully as Luna.";
+        $prompt .= "Respond naturally as Luna.";
 
         try {
             $response = Prism::text()
                 ->using('gemini', 'gemini-2.5-flash')
                 ->withPrompt($prompt)
                 ->withMaxTokens(4096)
-                ->usingTemperature(0.75)
+                ->usingTemperature(0.7)
                 ->generate();
 
             $aiReply = $response->text ?? "Hey! I'd love to help you with your expenses.";
 
-            // Save conversation
             $messages[] = ['role' => 'user', 'content' => $userMessage];
             $messages[] = ['role' => 'assistant', 'content' => $aiReply];
 
-            $conversation->update([
-                'messages' => $messages,
-                'title'    => $conversation->title ?: substr($userMessage, 0, 50) . '...',
-                'period'   => $periodInfo['main_period']
-            ]);
+            $conversation->update(['messages' => $messages]);
 
             return [
                 'success'        => true,
@@ -124,88 +143,116 @@ class AISuggestionService
 
         } catch (\Exception $e) {
             Log::error('AI Error: ' . $e->getMessage());
-            return ['success' => false, 'message' => 'Sorry, I had trouble responding. Please try again.'];
+            return ['success' => false, 'message' => 'Sorry, I had trouble responding.'];
         }
     }
 
-    /**
-     * Enhanced Period Detection
-     */
+    // Other methods remain the same
+    private function generateConversationTitle(string $message, array $periodInfo): string
+    {
+        $message = strtolower($message);
+
+        if ($periodInfo['main_period'] === 'specific_day') {
+            return $periodInfo['label'] . ' Spending';
+        }
+        if (str_contains($message, 'this month') || $periodInfo['main_period'] === 'month') {
+            return 'This Month Overview';
+        }
+        if (str_contains($message, 'last month')) {
+            return 'Last Month Summary';
+        }
+        if (isset($periodInfo['month'])) {
+            $monthName = Carbon::create($periodInfo['year'], $periodInfo['month'], 1)->format('F');
+            return "{$monthName} {$periodInfo['year']} Report";
+        }
+
+        return ucfirst(substr(trim($message), 0, 45)) . '...';
+    }
+
     private function detectPeriodFromMessage(string $message, string $defaultPeriod): array
     {
         $message = strtolower(trim($message));
+        $now = now();
 
-        $mainPeriod = $defaultPeriod;
+        if (str_contains($message, 'today')) {
+            return [
+                'main_period' => 'specific_day',
+                'start' => $now->copy()->startOfDay(),
+                'end'   => $now->copy()->endOfDay(),
+                'label' => 'Today'
+            ];
+        }
 
-        // Specific month names
-        $months = [
-            'january' => 1, 'jan' => 1,
-            'february' => 2, 'feb' => 2,
-            'march' => 3, 'mar' => 3,
-            'april' => 4, 'apr' => 4,
-            'may' => 5,
-            'june' => 6, 'jun' => 6,
-            'july' => 7, 'jul' => 7,
-            'august' => 8, 'aug' => 8,
-            'september' => 9, 'sep' => 9,
-            'october' => 10, 'oct' => 10,
-            'november' => 11, 'nov' => 11,
-            'december' => 12, 'dec' => 12,
-        ];
+        if (str_contains($message, 'yesterday')) {
+            return [
+                'main_period' => 'specific_day',
+                'start' => $now->copy()->subDay()->startOfDay(),
+                'end'   => $now->copy()->subDay()->endOfDay(),
+                'label' => 'Yesterday'
+            ];
+        }
 
-        foreach ($months as $name => $num) {
-            if (str_contains($message, $name)) {
+        if (preg_match('/(\w+)\s+(\d{1,2})/', $message, $matches)) {
+            $monthName = $matches[1];
+            $day = (int)$matches[2];
+
+            $months = ['january'=>1,'jan'=>1,'february'=>2,'feb'=>2,'march'=>3,'mar'=>3,'april'=>4,'apr'=>4,
+                       'may'=>5,'june'=>6,'jun'=>6,'july'=>7,'jul'=>7,'august'=>8,'aug'=>8,
+                       'september'=>9,'sep'=>9,'october'=>10,'oct'=>10,'november'=>11,'nov'=>11,
+                       'december'=>12,'dec'=>12];
+
+            if (isset($months[$monthName])) {
+                $year = $now->year;
+                $date = Carbon::create($year, $months[$monthName], $day);
                 return [
-                    'main_period' => 'specific_month',
-                    'month' => $num,
-                    'year' => now()->year
+                    'main_period' => 'specific_day',
+                    'start' => $date->copy()->startOfDay(),
+                    'end'   => $date->copy()->endOfDay(),
+                    'label' => $date->format('F d, Y')
                 ];
             }
         }
 
-        // Last month + month name (e.g., "last march")
-        if (preg_match('/last\s+([a-z]+)/', $message, $matches)) {
-            $monthName = $matches[1];
-            foreach ($months as $name => $num) {
-                if ($monthName === $name) {
-                    return [
-                        'main_period' => 'specific_month',
-                        'month' => $num,
-                        'year' => now()->year - (now()->month < $num ? 1 : 0)
-                    ];
-                }
+        $months = ['january'=>1,'jan'=>1,'february'=>2,'feb'=>2,'march'=>3,'mar'=>3,'april'=>4,'apr'=>4,
+                   'may'=>5,'june'=>6,'jun'=>6,'july'=>7,'jul'=>7,'august'=>8,'aug'=>8,
+                   'september'=>9,'sep'=>9,'october'=>10,'oct'=>10,'november'=>11,'nov'=>11,
+                   'december'=>12,'dec'=>12];
+
+        foreach ($months as $name => $num) {
+            if (str_contains($message, $name)) {
+                $year = $now->year;
+                if (str_contains($message, 'last') && $now->month < $num) $year--;
+                return ['main_period' => 'specific_month', 'month' => $num, 'year' => $year];
             }
         }
 
-        // This / Last / Previous
         if (str_contains($message, 'last month') || str_contains($message, 'previous month')) {
             return ['main_period' => 'last_month'];
         }
         if (str_contains($message, 'this month') || str_contains($message, 'current month')) {
             return ['main_period' => 'month'];
         }
-        if (str_contains($message, 'last week') || str_contains($message, 'previous week')) {
+        if (str_contains($message, 'last week')) {
             return ['main_period' => 'last_week'];
         }
         if (str_contains($message, 'this week')) {
             return ['main_period' => 'week'];
         }
-        if (str_contains($message, 'last year')) {
-            return ['main_period' => 'last_year'];
-        }
-        if (str_contains($message, 'this year')) {
-            return ['main_period' => 'year'];
-        }
 
         return ['main_period' => $defaultPeriod];
     }
 
-    /**
-     * Get one or more date ranges based on detected period
-     */
     private function getDateRanges(array $periodInfo): array
     {
-        $now = now();
+        $now = now()->startOfDay();
+
+        if ($periodInfo['main_period'] === 'specific_day') {
+            return [[
+                'start' => $periodInfo['start'],
+                'end'   => $periodInfo['end'],
+                'label' => $periodInfo['label']
+            ]];
+        }
 
         return match ($periodInfo['main_period']) {
             'specific_month' => [[
@@ -214,51 +261,33 @@ class AISuggestionService
                 'label' => Carbon::create($periodInfo['year'], $periodInfo['month'], 1)->format('F Y')
             ]],
 
-            'week' => [[
-                'start' => $now->startOfWeek(),
-                'end'   => $now->endOfWeek(),
-                'label' => 'This Week'
-            ]],
-
-            'last_week' => [[
-                'start' => $now->subWeek()->startOfWeek(),
-                'end'   => $now->subWeek()->endOfWeek(),
-                'label' => 'Last Week'
-            ]],
-
             'month' => [[
-                'start' => $now->startOfMonth(),
-                'end'   => $now->endOfMonth(),
+                'start' => $now->copy()->startOfMonth(),
+                'end'   => $now->copy()->endOfMonth(),
                 'label' => 'This Month'
             ]],
 
             'last_month' => [[
-                'start' => $now->subMonth()->startOfMonth(),
-                'end'   => $now->subMonth()->endOfMonth(),
+                'start' => $now->copy()->subMonth()->startOfMonth(),
+                'end'   => $now->copy()->subMonth()->endOfMonth(),
                 'label' => 'Last Month'
             ]],
 
-            '3months' => [[
-                'start' => $now->subMonths(3)->startOfMonth(),
-                'end'   => $now->endOfMonth(),
-                'label' => 'Last 3 Months'
+            'week' => [[
+                'start' => $now->copy()->startOfWeek(),
+                'end'   => $now->copy()->endOfWeek(),
+                'label' => 'This Week'
             ]],
 
-            'year' => [[
-                'start' => $now->startOfYear(),
-                'end'   => $now->endOfYear(),
-                'label' => 'This Year'
-            ]],
-
-            'last_year' => [[
-                'start' => $now->subYear()->startOfYear(),
-                'end'   => $now->subYear()->endOfYear(),
-                'label' => 'Last Year'
+            'last_week' => [[
+                'start' => $now->copy()->subWeek()->startOfWeek(),
+                'end'   => $now->copy()->subWeek()->endOfWeek(),
+                'label' => 'Last Week'
             ]],
 
             default => [[
-                'start' => $now->startOfMonth(),
-                'end'   => $now->endOfMonth(),
+                'start' => $now->copy()->startOfMonth(),
+                'end'   => $now->copy()->endOfMonth(),
                 'label' => 'This Month'
             ]]
         };

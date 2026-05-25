@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'track.transaction' => \App\Http\Middleware\TrackTransaction::class,
+            'premium' => \App\Http\Middleware\PremiumMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

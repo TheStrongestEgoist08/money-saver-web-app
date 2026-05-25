@@ -82,7 +82,7 @@ Route::controller(ReportController::class)->middleware(['auth', 'verified'])->pr
 });
 
 # Suggestion route
-Route::controller(SuggestionController::class)->middleware(['auth', 'verified'])->prefix('user')->group(function() {
+Route::controller(SuggestionController::class)->middleware(['auth', 'verified', 'premium'])->prefix('user')->group(function() {
     Route::get('/suggestions', 'index')
         ->name('user.suggestions');
 
