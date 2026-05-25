@@ -1,58 +1,93 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# MoneyTrackr
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Author
+**Bigal, Carl Michael C.**  
 
-## About Laravel
+## Program
+**BSIT 4-1**
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+# Project Description
+MoneyTrackr is a web-based financial management platform designed to help users monitor, organize, and manage their personal finances efficiently. The system provides an intuitive interface where users can record expenses, manage wallets, set financial goals, and generate detailed financial reports. With built-in security features and a user-friendly dashboard, MoneyTrackr aims to make budgeting and expense tracking simple, secure, and accessible for everyday users.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+# Features
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## User Registration and Authentication
+Provides a secure registration and login system that allows users to create personal accounts and safely access their financial data.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Personalized Dashboard
+Displays an organized overview of the user’s financial information, including recent expenses, wallet balances, and spending summaries.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## Expense Management
+Allows users to create, edit, categorize, and track daily expenses to help monitor spending habits and financial activities.
 
-## Agentic Development
+## Wallet Management
+Enables users to manage multiple wallets or accounts, track balances, and monitor available funds in real time.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Goals Management
+Helps users set financial goals, monitor progress, and stay motivated in achieving savings or budgeting targets.
+
+## Report Generation
+Generates detailed financial reports and summaries that provide insights into expenses, budgeting patterns, and overall financial performance.
+
+## Security Features
+Implements authentication, access control, and data protection measures to ensure user information and financial records remain secure.
+
+---
+
+# Technologies Used
+
+| Category | Technology |
+|----------|-------------|
+| Backend | PHP |
+| Frontend | HTML, CSS, JavaScript, Blade |
+| Database | MySQL |
+| Framework | Laravel 13 |
+| Tools | Visual Studio Code, Laragon |
+
+---
+
+# Installation Guide
+
+## Step 1
+Extract the ZIP file.
+
+## Step 2
+Open the extracted project folder in your preferred IDE.
+
+## Step 3
+Configure the `.env` file and set the database password based on your MySQL root account password.
+
+## Step 4
+Create the database and run migrations using the following command:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+php artisan migrate
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Alternatively, you may manually create the database using the provided SQL statements.
 
-## Contributing
+## Step 5
+Run the Laravel development server:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+php artisan serve
+```
 
-## Code of Conduct
+## Step 6
+Open a new terminal and run the frontend development server:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+npm run dev
+```
 
-## Security Vulnerabilities
+After that, open the provided local URL:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```txt
+http://127.0.0.1:8000
+```
 
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
