@@ -11,7 +11,7 @@ class PremiumMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (!auth()->user()->is_premium) {
-            abort(403, 'Premium Access Required');
+            return redirect()->route('premium.choose');
         }
 
         return $next($request);

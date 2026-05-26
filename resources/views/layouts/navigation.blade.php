@@ -50,7 +50,9 @@
                 </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('user.suggestions')" :active="request()->routeIs('user.suggestions')">
+                    <x-nav-link
+                        :href="auth()->user()->is_premium ? route('user.suggestions') : route('premium.choose')"
+                        :active="request()->routeIs('user.suggestions') || request()->routeIs('premium.choose')">
                         {{ __('AI') }}
                     </x-nav-link>
                 </div>
@@ -129,7 +131,9 @@
                 {{ __('Reports') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('user.suggestions')" :active="request()->routeIs('user.suggestions')">
+            <x-responsive-nav-link
+                :href="auth()->user()->is_premium ? route('user.suggestions') : route('premium.choose')"
+                :active="request()->routeIs('user.suggestions') || request()->routeIs('premium.choose')">
                 {{ __('AI') }}
             </x-responsive-nav-link>
         </div>
