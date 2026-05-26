@@ -3,7 +3,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-2xl md:text-3xl text-gray-800 tracking-tight">
-            My Goals
+            🎯 My Goals
         </h2>
     </x-slot>
 
