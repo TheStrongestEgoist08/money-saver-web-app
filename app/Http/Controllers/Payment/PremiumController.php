@@ -104,12 +104,6 @@ class PremiumController extends Controller
                 ->with('error', 'Invalid premium plan.');
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Prevent duplicate upgrading
-        |--------------------------------------------------------------------------
-        */
-
         if ($user->is_premium && $user->premium_until > now()) {
 
             $premiumUntil = match ($plan) {
