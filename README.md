@@ -78,7 +78,16 @@ Open the project folder in your preferred IDE.
 Configure the `.env` file and set your database credentials.
 
 ## Step 4
-Run database migrations:
+Run the following command:
 
 ```bash
 php artisan migrate
+
+npm install
+
+php artisan storage:link
+
+composer update
+
+php artisan serve
+npm run dev
