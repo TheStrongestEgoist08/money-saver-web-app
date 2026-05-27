@@ -26,7 +26,7 @@ class ExpenseController extends Controller
 
         $expenses = Expense::where('user_id', auth()->id())
             ->latest()
-            ->paginate(30);
+            ->paginate(99);
 
         $categoryData = Expense::where('user_id', auth()->id())
             ->selectRaw('type, SUM(total) as total_amount')
