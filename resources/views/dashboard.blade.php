@@ -15,7 +15,18 @@
                     <div class="bg-white shadow-xl shadow-gray-100/50 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div>
                             <h3 class="text-2xl md:text-3xl font-semibold text-gray-900">
-                                Good morning, {{ auth()->user()?->name ?? 'User' }} 👋
+                                @php
+                                    $hour = (int) now()->format('H');
+                                    
+                                    $greeting = match(true) {
+                                        $hour >= 5 && $hour < 12  => 'Good morning',
+                                        $hour >= 12 && $hour < 17 => 'Good afternoon',
+                                        $hour >= 17 && $hour < 22 => 'Good evening',
+                                        default                   => 'Good evening',
+                                    };
+                                @endphp
+
+                                {{ $greeting }}, {{ auth()->user()?->name ?? 'User' }} 👋
                             </h3>
                             <p class="text-gray-500 mt-2 text-base md:text-lg">Here's what's happening with your money today</p>
                         </div>

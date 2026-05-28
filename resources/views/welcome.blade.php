@@ -16,6 +16,8 @@
     @else
         <script src="https://cdn.tailwindcss.com"></script>
     @endif
+
+    <link rel="icon" type="image/png" href="{{ asset('storage/icons/logo_transparent.png') }}">
 </head>
 
 <body class="bg-white text-zinc-900 min-h-screen overflow-x-hidden">
@@ -23,7 +25,6 @@
     {{-- Navigation --}}
     <header class="border-b border-emerald-100 bg-white/90 backdrop-blur sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-
             {{-- Logo --}}
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-emerald-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-emerald-500/30">
@@ -66,7 +67,6 @@
 
     {{-- Hero Section --}}
     <section class="relative overflow-hidden">
-
         {{-- Background Decorations --}}
         <div class="absolute inset-0 opacity-10">
             <div class="absolute top-20 left-10 w-72 h-72 bg-emerald-400 rounded-full blur-3xl"></div>
@@ -74,12 +74,9 @@
         </div>
 
         <div class="relative max-w-7xl mx-auto px-6 py-24 lg:py-32">
-
             <div class="grid lg:grid-cols-2 gap-16 items-center">
-
                 {{-- Left Content --}}
                 <div>
-
                     <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-medium mb-8">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         Track expenses. Manage wallets. Achieve goals.
@@ -99,7 +96,6 @@
 
                     {{-- Buttons --}}
                     <div class="flex flex-col sm:flex-row gap-4 mt-10">
-
                         @guest
                             <a href="{{ route('register') }}"
                                class="px-9 py-5 rounded-3xl bg-emerald-600 hover:bg-emerald-700 text-white text-lg font-semibold transition-all active:scale-95 shadow-2xl shadow-emerald-500/30 text-center">
@@ -115,7 +111,6 @@
 
                     {{-- Features --}}
                     <div class="grid grid-cols-2 gap-5 mt-12">
-
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-2xl bg-emerald-100 flex items-center justify-center">
                                 📊
@@ -179,17 +174,14 @@
                                 </p>
                             </div>
                         </div>
-
                     </div>
                 </div>
 
                 {{-- Right Card --}}
                 <div class="relative">
-
                     <div class="absolute -top-10 -left-10 w-32 h-32 bg-emerald-200 rounded-full blur-3xl opacity-60"></div>
 
                     <div class="relative bg-white border border-emerald-100 rounded-[40px] shadow-2xl p-8">
-
                         <div class="flex items-center justify-between mb-8">
                             <div>
                                 <p class="text-zinc-500 text-sm">
@@ -207,7 +199,6 @@
                         </div>
 
                         <div class="space-y-5">
-
                             <div class="p-5 rounded-3xl bg-emerald-50 flex justify-between items-center">
                                 <div>
                                     <p class="font-semibold">
@@ -247,12 +238,10 @@
                                         Custom date range
                                     </p>
                                 </div>
-
                                 <span class="text-emerald-600 font-bold">
                                     Generate
                                 </span>
                             </div>
-
                         </div>
 
                         <div class="mt-8 p-5 rounded-3xl bg-gradient-to-r from-emerald-600 to-lime-500 text-white">
@@ -265,19 +254,15 @@
                                 Grow where your future flows.”
                             </h3>
                         </div>
-
                     </div>
                 </div>
-
             </div>
         </div>
     </section>
 
     {{-- Features --}}
     <section id="features" class="py-24 bg-emerald-50">
-
         <div class="max-w-7xl mx-auto px-6">
-
             <div class="text-center max-w-2xl mx-auto mb-16">
                 <h2 class="text-4xl font-black tracking-tight">
                     Everything You Need To
@@ -291,7 +276,6 @@
             </div>
 
             <div class="grid md:grid-cols-3 gap-8">
-
                 <div class="bg-white rounded-[32px] p-8 shadow-lg border border-emerald-100">
                     <div class="text-5xl mb-6">📊</div>
 
@@ -327,16 +311,13 @@
                         Set savings goals, track progress, and generate detailed financial reports.
                     </p>
                 </div>
-
             </div>
         </div>
     </section>
 
     {{-- CTA --}}
     <section class="py-24">
-
         <div class="max-w-4xl mx-auto px-6 text-center">
-
             <div class="bg-gradient-to-r from-emerald-600 to-lime-500 rounded-[40px] p-12 text-white shadow-2xl">
 
                 <h2 class="text-4xl lg:text-5xl font-black leading-tight">
@@ -362,9 +343,7 @@
 
     {{-- Footer --}}
     <footer class="border-t border-emerald-100 py-10 bg-white">
-
         <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-
             <div>
                 <h3 class="font-black text-emerald-700 text-2xl">
                     PesoFlow
@@ -378,9 +357,7 @@
             <p class="text-zinc-500 text-sm">
                 © {{ date('Y') }} PesoFlow. Built for smarter financial growth.
             </p>
-
         </div>
     </footer>
-
 </body>
 </html>
