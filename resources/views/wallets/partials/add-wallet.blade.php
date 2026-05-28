@@ -19,12 +19,16 @@
             <div class="p-8 space-y-6">
                 <!-- Wallet Name -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Wallet Name (Optional)</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Wallet Name</label>
                     <input
                         type="text"
                         name="wallet_name"
+                        required
                         placeholder="e.g. Main Wallet, GCash, BPI Savings"
-                        class="w-full px-5 py-4 border border-gray-200 rounded-2xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 outline-none">
+                        class="w-full px-5 py-4 border border-gray-200 rounded-2xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 outline-none"
+                        minlength="1"
+                        maxlength="25"
+                    >
                 </div>
 
                 <!-- Wallet Type -->

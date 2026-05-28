@@ -26,7 +26,8 @@
                             type="number"
                             name="amount"
                             step="0.01"
-                            min="1"
+                            min="0.01"
+                            max="10000"
                             placeholder="0.00"
                             required
                             class="w-full pl-12 pr-6 py-5 border border-gray-200 rounded-2xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 outline-none text-3xl font-semibold">
@@ -37,7 +38,7 @@
             <!-- Footer -->
             <div class="p-6 border-t flex gap-3">
                 <button
-                    type="button"
+                    type="reset"
                     @click="openAddBalance = false"
                     class="flex-1 py-4 text-gray-600 font-medium rounded-2xl hover:bg-gray-100 transition-colors">
                     Cancel
