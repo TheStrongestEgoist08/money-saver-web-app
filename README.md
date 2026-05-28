@@ -1,4 +1,4 @@
-# MoneyTrackr
+# PesoFlow
 
 ## Author
 **Bigal, Carl Michael C.**

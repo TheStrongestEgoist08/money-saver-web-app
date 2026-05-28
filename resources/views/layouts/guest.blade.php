@@ -7,31 +7,43 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'MoneySaver') }} - Save Smarter</title>
+        <title>{{ config('app.name', 'PesoFlow') }} - Smart Spending Better Saving</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
         <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><rect width="36" height="36" rx="18" fill="%23fff"/><path fill="%23027e04" d="M14.18 13.8V16h9.45a5.26 5.26 0 0 0 .08-.89 4.72 4.72 0 0 0-.2-1.31zM14.18 19.7h5.19a4.28 4.28 0 0 0 3.5-1.9H14.18zM19.37 10.51H14.18V12h8.37a4.21 4.21 0 0 0-3.18-1.49zM17.67 2a16 16 0 1 0 16 16A16 16 0 0 0 17.67 2zm10.5 15.8H25.7a6.87 6.87 0 0 1-6.33 4.4H14.18v6.54a1.25 1.25 0 1 1-2.5 0V17.8H8.76a.9.9 0 1 1 0-1.8h2.92V13.8H8.76a.9.9 0 1 1 0-1.8h2.92V9.26A1.25 1.25 0 0 1 12.93 8h6.44a6.84 6.84 0 0 1 6.15 4h2.65a.9.9 0 0 1 0 1.8H26.09a6.91 6.91 0 0 1 .12 1.3 6.8 6.8 0 0 1-.06.9h2a.9.9 0 0 1 0 1.8z"/></svg>'>
+
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
 
-    <body class="font-sans text-white antialiased bg-zinc-950">
+    <body class="font-sans text-zinc-900 antialiased bg-zinc-50">
 
-        <div class="min-h-screen flex flex-col justify-center items-center p-6 bg-zinc-950">
+        <div class="min-h-screen flex flex-col justify-center items-center p-6 bg-zinc-50">
 
-            <div class="flex justify-center mb-5">
+            <div class="flex justify-center mb-8">
                 <div class="flex items-center gap-3">
-                    <x-application-logo class="block h-9 w-auto fill-current text-green-500 bg-white rounded-full" />
-                    <span class="font-semibold text-3xl tracking-tighter">MoneyTrackr</span>
+                    <div class="w-11 h-11 rounded-3xl bg-emerald-600 text-white flex items-center justify-center text-3xl shadow-lg shadow-emerald-500/30">
+                        ₱
+                    </div>
+                    <div>
+                        <span class="font-black text-3xl tracking-tight text-emerald-700">PesoFlow</span>
+                        <p class="text-xs text-zinc-500 -mt-1">Smart Spending Better Saving</p>
+                    </div>
                 </div>
             </div>
 
             <!-- Main Card -->
-            <div class="w-full sm:max-w-md mt-6 px-6 py-8 bg-zinc-900 border border-zinc-800 shadow-2xl overflow-hidden sm:rounded-3xl">
+            <div class="w-full sm:max-w-md mt-6 px-6 py-10 bg-white border border-emerald-100 shadow-xl overflow-hidden sm:rounded-3xl">
                 {{ $slot }}
             </div>
+
+            <!-- Footer -->
+            <p class="text-center text-zinc-500 text-xs mt-8">
+                © {{ date('Y') }} PesoFlow. All rights reserved.
+            </p>
+
         </div>
     </body>
 </html>
