@@ -9,7 +9,7 @@
 ---
 
 # Project Description
-MoneyTrackr is a web-based financial management platform designed to help users monitor, organize, and manage their personal finances efficiently. The system provides an intuitive interface where users can record expenses, manage wallets, set financial goals, and generate detailed financial reports. With built-in security features and a user-friendly dashboard, MoneyTrackr aims to make budgeting and expense tracking simple, secure, and accessible for everyday users.
+PesoFlow is a web-based financial management platform designed to help users monitor, organize, and manage their personal finances efficiently. The system provides an intuitive interface where users can record expenses, manage wallets, set financial goals, and generate detailed financial reports. With built-in security features and a user-friendly dashboard, PesoFlow aims to make budgeting and expense tracking simple, secure, and accessible for everyday users.
 
 The system also includes a **premium subscription feature powered by PayMongo**, allowing users to securely upgrade their accounts using **GCash, PayMaya, and credit/debit cards**. Premium users gain access to an **AI Financial Assistant** and a completely **ad-free experience**, improving usability and productivity.
 
