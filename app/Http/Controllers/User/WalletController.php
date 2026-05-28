@@ -30,7 +30,7 @@ class WalletController extends Controller
         }
 
         $validatedData = $request->validate([
-            'wallet_name' => ['nullable', 'string', 'max:100'],
+            'wallet_name' => ['nullable', 'string', 'max:25'],
             'wallet_type' => ['required', 'in:bank,e-wallet,wallet'],
         ]);
 
@@ -70,7 +70,7 @@ class WalletController extends Controller
 
         $validatedData = $request->validate([
             'wallet_id' => ['required', 'exists:wallets,id'],
-            'amount'    => ['required', 'numeric', 'min:1'],
+            'amount'    => ['required', 'numeric', 'min:1', 'max:10000'],
         ]);
 
         try {
@@ -105,7 +105,7 @@ class WalletController extends Controller
         $validated = $request->validate([
             'from_wallet_id' => ['required', 'exists:wallets,id'],
             'to_wallet_id'   => ['required', 'exists:wallets,id', 'different:from_wallet_id'],
-            'amount'         => ['required', 'numeric', 'min:0.01'],
+            'amount'         => ['required', 'numeric', 'min:1'],
         ]);
 
         try {

@@ -81,7 +81,7 @@
                             type="number"
                             name="amount"
                             step="0.01"
-                            min="0.01"
+                            min="1"
                             :max="maxAmount"
                             x-model.number="amount"
                             placeholder="0.00"
