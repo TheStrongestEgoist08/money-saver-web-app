@@ -200,7 +200,7 @@
                 </button>
             </template>
 
-            <template x-if="selectedGoal?.status === 'Cancelled' || selectedGoal?.status === 'Failed'">
+            <template x-if="selectedGoal?.status === 'cancelled' || selectedGoal?.status === 'failed'">
                 <button
                     type="button"
                     @click.prevent="if(confirm('Are you sure you want to permanently delete this goal? This action cannot be undone.')) {
