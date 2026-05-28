@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
 
 class GoalsController extends Controller
 {
@@ -17,8 +18,14 @@ class GoalsController extends Controller
             ->latest()
             ->paginate(50);
 
+        $goalCounts = Goal::where('user_id', Auth::id())
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
         return view('goals.index', [
             'goals' => $goals,
+            'goalCounts' => $goalCounts,
         ]);
     }
 
@@ -41,11 +48,17 @@ class GoalsController extends Controller
         }
 
         $goals = $query->latest()
-                       ->paginate(50)
-                       ->appends($request->query());
+            ->paginate(50)
+            ->appends($request->query());
+
+        $goalCounts = Goal::where('user_id', Auth::id())
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
 
         return view('goals.index', [
             'goals' => $goals,
+            'goalCounts' => $goalCounts,
         ]);
     }
 
@@ -121,6 +134,76 @@ class GoalsController extends Controller
             return redirect()
                 ->back()
                 ->with('error', 'Something went wrong. Please try again.');
+        }
+    }
+
+    public function cancel(Request $request, $id)
+    {
+        $goal = Goal::where('user_id', Auth::id())
+                    ->findOrFail($id);
+
+        // Prevent cancelling already completed goals
+        if ($goal->status === 'completed') {
+            return redirect()
+                ->back()
+                ->with('error', 'Completed goals cannot be cancelled.');
+        }
+
+        // Prevent cancelling if already cancelled
+        if ($goal->status === 'cancelled') {
+            return redirect()
+                ->back()
+                ->with('error', 'This goal is already cancelled.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $goal->update([
+                'status' => 'cancelled',
+            ]);
+
+            DB::commit();
+
+            return redirect()
+                ->route('user.goals')
+                ->with('success', 'Goal has been cancelled successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()
+                ->back()
+                ->with('error', 'Something went wrong while cancelling the goal.');
+        }
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        $goal = Goal::where('user_id', Auth::id())
+            ->findOrFail($id);
+
+        try {
+            DB::beginTransaction();
+
+            // Delete image from storage if exists
+            if ($goal->image) {
+                Storage::disk('public')->delete($goal->image);
+            }
+
+            $goal->delete();
+
+            DB::commit();
+
+            return redirect()
+                ->route('user.goals')
+                ->with('success', 'Goal deleted successfully!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()
+                ->back()
+                ->with('error', 'Something went wrong while deleting the goal.');
         }
     }
 }

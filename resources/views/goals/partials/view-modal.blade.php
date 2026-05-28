@@ -31,7 +31,6 @@
                 <h2 class="text-2xl font-bold text-gray-900">
                     Goal Details
                 </h2>
-
                 <p class="text-sm text-gray-500 mt-1">
                     View your savings goal progress.
                 </p>
@@ -93,9 +92,9 @@
                                 'bg-emerald-100 text-emerald-700': selectedGoal?.status === 'Completed',
                                 'bg-red-100 text-red-700': selectedGoal?.status === 'Cancelled',
                                 'bg-rose-100 text-rose-700': selectedGoal?.status === 'Failed',
-                                'bg-amber-100 text-amber-700': selectedGoal?.status === 'In Progress'
+                                'bg-amber-100 text-amber-700': selectedGoal?.status === 'active' || selectedGoal?.status === 'In Progress'
                             }"
-                            x-text="selectedGoal?.status || 'In Progress'"
+                            x-text="selectedGoal?.status === 'active' ? 'Active' : selectedGoal?.status"
                         ></span>
                     </div>
 
@@ -107,7 +106,6 @@
                             <p class="text-sm text-emerald-700 font-medium mb-1">
                                 Saved Amount
                             </p>
-
                             <h4
                                 class="text-3xl font-bold text-emerald-600"
                                 x-text="'₱' + Number(selectedGoal?.saved_amount || 0).toLocaleString(undefined, {minimumFractionDigits: 2})"
@@ -119,7 +117,6 @@
                             <p class="text-sm text-indigo-700 font-medium mb-1">
                                 Target Amount
                             </p>
-
                             <h4
                                 class="text-3xl font-bold text-indigo-600"
                                 x-text="'₱' + Number(selectedGoal?.target_amount || 0).toLocaleString(undefined, {minimumFractionDigits: 2})"
@@ -131,12 +128,10 @@
                     {{-- Deadline --}}
                     <div class="flex items-center gap-3 text-gray-600">
                         <span class="text-2xl">📅</span>
-
                         <div>
                             <p class="text-sm text-gray-400">
                                 Target Date
                             </p>
-
                             <p
                                 class="font-semibold"
                                 x-text="
@@ -158,12 +153,10 @@
 
             {{-- Progress --}}
             <div class="space-y-3">
-
                 <div class="flex items-center justify-between">
                     <h4 class="text-lg font-bold text-gray-900">
                         Progress
                     </h4>
-
                     <span
                         class="text-lg font-bold text-indigo-600"
                         x-text="Math.min(
@@ -176,21 +169,58 @@
                 <div class="h-4 bg-gray-100 rounded-full overflow-hidden">
                     <div
                         class="h-full bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-500"
-                        :style="`width: ${
-                            Math.min(
-                                100,
-                                ((selectedGoal?.saved_amount || 0) / (selectedGoal?.target_amount || 1)) * 100
-                            )
-                        }%`"
+                        :style="`width: ${Math.min(100, ((selectedGoal?.saved_amount || 0) / (selectedGoal?.target_amount || 1)) * 100)}%`"
                     ></div>
                 </div>
-
             </div>
 
         </div>
 
         {{-- Footer --}}
-        <div class="px-6 md:px-8 py-5 border-t border-gray-100 flex justify-end">
+        <div class="px-6 md:px-8 py-5 border-t border-gray-100 flex justify-end items-center gap-3">
+
+            <!-- Cancel / Delete Button -->
+            <template x-if="selectedGoal?.status === 'active' || selectedGoal?.status === 'In Progress'">
+                <button
+                    type="button"
+                    @click.prevent="if(confirm('Are you sure you want to cancel this goal? This action cannot be undone.')) {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '/user/goals/cancel/' + selectedGoal.id;
+                        form.innerHTML = `
+                            <input type='hidden' name='_token' value='${document.querySelector('meta[name=&quot;csrf-token&quot;]').getAttribute('content')}'>
+                            <input type='hidden' name='_method' value='PATCH'>
+                        `;
+                        document.body.appendChild(form);
+                        form.submit();
+                    }"
+                    class="px-6 py-3 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-semibold transition-all"
+                >
+                    Cancel Goal
+                </button>
+            </template>
+
+            <template x-if="selectedGoal?.status === 'Cancelled' || selectedGoal?.status === 'Failed'">
+                <button
+                    type="button"
+                    @click.prevent="if(confirm('Are you sure you want to permanently delete this goal? This action cannot be undone.')) {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '/user/goals/delete/' + selectedGoal.id;
+                        form.innerHTML = `
+                            <input type='hidden' name='_token' value='${document.querySelector('meta[name=&quot;csrf-token&quot;]').getAttribute('content')}'>
+                            <input type='hidden' name='_method' value='DELETE'>
+                        `;
+                        document.body.appendChild(form);
+                        form.submit();
+                    }"
+                    class="px-6 py-3 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-semibold transition-all"
+                >
+                    Delete Goal
+                </button>
+            </template>
+
+            <!-- Close Button -->
             <button
                 type="button"
                 @click="closeModal()"
@@ -198,6 +228,7 @@
             >
                 Close
             </button>
+
         </div>
     </div>
 </div>

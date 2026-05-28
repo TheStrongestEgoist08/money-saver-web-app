@@ -118,7 +118,7 @@
                                     View
                                 </button>
 
-                                @if (!$goal->isCompleted())
+                                @if ($goal->status === 'active')
                                     <button @click='openAddMoneyModal(@json($goal))'
                                         class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-500 text-white text-sm font-semibold hover:from-emerald-600 hover:to-green-600 transition-all">
                                         Add
@@ -207,7 +207,7 @@
                         View
                     </button>
 
-                    @if (!$goal->isCompleted())
+                    @if ($goal->status === 'active')
                         <button
                             @click='openAddMoneyModal(@json($goal))'
                             class="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-500 text-white text-sm font-semibold hover:from-emerald-600 hover:to-green-600 transition-all active:scale-[0.97]">

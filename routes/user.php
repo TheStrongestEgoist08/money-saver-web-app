@@ -67,6 +67,12 @@ Route::controller(GoalsController::class)->middleware(['auth', 'verified'])->pre
 
     Route::post('/goals/add-money', 'addMoney')
         ->name('user.goals.add-money');
+
+    Route::patch('/goals/cancel/{id}', 'cancel')
+        ->name('user.goals.cancel');
+
+    Route::delete('/goals/delete/{id}', 'destroy')
+        ->name('user.goals.destroy');
 });
 
 # Report route

@@ -16,6 +16,7 @@
                 <input
                     type="text"
                     x-model="search"
+                    name="search"
                     placeholder="Search goal..."
                     class="w-full pl-11 pr-5 py-3 bg-white border-gray-200 rounded-2xl focus:border-emerald-500 focus:ring-emerald-500 outline-none transition-all">
                 <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔍</div>
