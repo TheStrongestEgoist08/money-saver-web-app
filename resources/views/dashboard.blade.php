@@ -17,7 +17,7 @@
                             <h3 class="text-2xl md:text-3xl font-semibold text-gray-900">
                                 @php
                                     $hour = (int) now()->format('H');
-                                    
+
                                     $greeting = match(true) {
                                         $hour >= 5 && $hour < 12  => 'Good morning',
                                         $hour >= 12 && $hour < 17 => 'Good afternoon',
@@ -105,7 +105,7 @@
                     </div>
                 </div>
 
-                <!-- Expense Breakdown - Pie Chart (Like Expense Page) -->
+                <!-- Expense Breakdown - Pie Chart -->
                 <div class="lg:col-span-12">
                     <div class="bg-white shadow-xl shadow-gray-100/50 rounded-3xl p-6 md:p-8">
                         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
@@ -133,6 +133,26 @@
                                 <h4 class="font-medium text-gray-700 mb-5 text-lg">Categories</h4>
                                 <div id="custom-legend" class="space-y-5 max-h-[420px] overflow-y-auto pr-2 custom-scroll"></div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Yearly Monthly Expense Bar Chart -->
+                <div class="lg:col-span-12">
+                    <div class="bg-white shadow-xl shadow-gray-100/50 rounded-3xl p-6 md:p-8">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+                            <div>
+                                <h3 class="text-2xl font-semibold text-gray-900">Monthly Expenses</h3>
+                                <p class="text-gray-500 mt-1">{{ now()->year }} • Total per Month</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs uppercase tracking-widest text-gray-500">Total This Year</p>
+                                <p id="year-total" class="text-3xl font-bold text-gray-900">₱0</p>
+                            </div>
+                        </div>
+
+                        <div class="h-[380px] md:h-[420px]">
+                            <canvas id="yearlyExpenseChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -201,7 +221,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -324,4 +343,68 @@
             background-color: #9ca3af;
         }
     </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Yearly Bar Chart
+            const yearlyCtx = document.getElementById('yearlyExpenseChart');
+
+            const monthLabels = @json($monthLabels ?? []);
+            const monthlyData = @json($monthlyAmounts ?? []);
+
+            const yearlyTotal = monthlyData.reduce((sum, val) => sum + Number(val), 0);
+            document.getElementById('year-total').textContent = '₱' + yearlyTotal.toLocaleString('en-US');
+
+            new Chart(yearlyCtx, {
+                type: 'bar',
+                data: {
+                    labels: monthLabels,
+                    datasets: [{
+                        label: 'Monthly Expense',
+                        data: monthlyData,
+                        backgroundColor: '#f43f5e',
+                        borderColor: '#e11d48',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        hoverBackgroundColor: '#e11d48',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#f1f5f9',
+                            bodyColor: '#e2e8f0',
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ₱' + context.raw.toLocaleString('en-US');
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' },
+                            ticks: {
+                                callback: function(value) {
+                                    return '₱' + value.toLocaleString('en-US');
+                                }
+                            }
+                        },
+                        x: {
+                            grid: { color: '#f1f5f9' }
+                        }
+                    },
+                    animation: {
+                        duration: 1200,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        });
+    </script>
 </x-app-layout>

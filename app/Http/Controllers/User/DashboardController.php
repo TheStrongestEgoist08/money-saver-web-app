@@ -47,11 +47,28 @@ class DashboardController extends Controller
         $categoryLabels = $categoryData->pluck('type');
         $categoryAmounts = $categoryData->pluck('total_amount');
 
-        // 🔥 Top Expense (Most Expensive Category This Month)
-        $topExpense = $categoryData->first(); // Get the highest one
+        // Top Expense (Most Expensive Category This Month)
+        $topExpense = $categoryData->first();
 
         $topExpenseCategory = $topExpense ? $topExpense->type : 'No expenses yet';
         $topExpenseAmount   = $topExpense ? $topExpense->total_amount : 0;
+
+        $monthlyExpenses = Expense::where('user_id', $user->id)
+            ->whereYear('created_at', Carbon::now()->year)
+            ->selectRaw('MONTH(created_at) as month, SUM(total) as total')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+
+        $months = [];
+        $monthlyAmounts = array_fill(0, 12, 0);
+
+        foreach ($monthlyExpenses as $expense) {
+            $monthIndex = $expense->month - 1;
+            $monthlyAmounts[$monthIndex] = $expense->total;
+        }
+
+        $monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
         return view('dashboard', compact(
             'userBalance',
@@ -61,7 +78,9 @@ class DashboardController extends Controller
             'categoryLabels',
             'categoryAmounts',
             'topExpenseCategory',
-            'topExpenseAmount'
+            'topExpenseAmount',
+            'monthLabels',
+            'monthlyAmounts'
         ));
     }
 }
