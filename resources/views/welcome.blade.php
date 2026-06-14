@@ -192,6 +192,54 @@
         </div>
     </section>
 
+    {{-- Video Ads Section --}}
+    <section class="py-24 bg-emerald-50">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <h2 class="text-4xl font-black tracking-tight text-zinc-900">
+                    Our Latest Ads
+                </h2>
+                <p class="text-zinc-600 mt-4 text-lg">
+                    Watch our promotional videos and discover why PesoFlow is the smartest way to manage your money.
+                </p>
+            </div>
+
+            <div class="max-w-5xl mx-auto relative group">
+                <div class="bg-white rounded-3xl overflow-hidden shadow-xl border border-emerald-100">
+                    <video
+                        id="adVideo"
+                        class="w-full aspect-video"
+                        autoplay
+                        muted
+                        loop
+                        playsinline>
+
+                        <!-- Replace with your actual ad video -->
+                        <source src="YOUR_VIDEO_AD_URL_HERE.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+
+                <!-- Video Controls Overlay -->
+                <div class="absolute bottom-6 right-6 flex gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <!-- Mute Button -->
+                    <button onclick="toggleMute()"
+                            id="muteBtn"
+                            class="bg-white/90 hover:bg-white shadow-lg p-4 rounded-2xl text-emerald-700 transition">
+                        <span id="muteIcon" class="text-2xl">🔇</span>
+                    </button>
+
+                    <!-- Fullscreen Button -->
+                    <button onclick="toggleFullscreen()"
+                            id="fullscreenBtn"
+                            class="bg-white/90 hover:bg-white shadow-lg p-4 rounded-2xl text-emerald-700 transition">
+                        <span id="fullscreenIcon" class="text-2xl">⛶</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
     {{-- Premium Plans Section --}}
     <section class="py-24 bg-white">
         <div class="max-w-7xl mx-auto px-6">
@@ -332,5 +380,42 @@
             </p>
         </div>
     </footer>
+
+    <script>
+        const video = document.getElementById('adVideo');
+        const muteBtn = document.getElementById('muteBtn');
+        const muteIcon = document.getElementById('muteIcon');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const fullscreenIcon = document.getElementById('fullscreenIcon');
+
+        function toggleMute() {
+            video.muted = !video.muted;
+
+            if (video.muted) {
+                muteIcon.textContent = '🔇';
+            } else {
+                muteIcon.textContent = '🔊';
+            }
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                video.requestFullscreen().catch(err => {
+                    console.error(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+                fullscreenIcon.textContent = '⤢'; // Exit icon
+            } else {
+                document.exitFullscreen();
+                fullscreenIcon.textContent = '⛶';
+            }
+        }
+
+        // Update icon when fullscreen changes
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                fullscreenIcon.textContent = '⛶';
+            }
+        });
+    </script>
 </body>
 </html>
