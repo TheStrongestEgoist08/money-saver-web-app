@@ -215,7 +215,7 @@
                         playsinline>
 
                         <!-- Replace with your actual ad video -->
-                        <source src="YOUR_VIDEO_AD_URL_HERE.mp4" type="video/mp4">
+                        <source src="{{ asset('storage/ads/ads.mp4') }}" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
                 </div>
